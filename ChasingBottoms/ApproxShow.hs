@@ -3,7 +3,11 @@
 -- | Functions for converting arbitrary (non-function, partial,
 -- possibly infinite) values into strings.
 
-module ChasingBottoms.ApproxShow(Prec, ApproxShow(..), module Nat) where
+module ChasingBottoms.ApproxShow
+  ( Prec
+  , ApproxShow(..)
+  , module ChasingBottoms.Nat
+  ) where
 
 import Data.Generics
 import ChasingBottoms.IsBottom

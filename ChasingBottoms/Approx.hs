@@ -1,6 +1,9 @@
 {-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
 
-module ChasingBottoms.Approx(Approx(..), module Nat) where
+module ChasingBottoms.Approx
+  ( Approx(..)
+  , module ChasingBottoms.Nat
+  ) where
 
 import ChasingBottoms.Nat
 import Data.Generics

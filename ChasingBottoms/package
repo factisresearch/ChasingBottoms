@@ -2,5 +2,6 @@
 
 mkdir -p docs
 cd ..
-haddock -h -oChasingBottoms/docs ChasingBottoms/*hs
+ls ChasingBottoms/*hs | grep -v '/IsType.hs$' | \
+  xargs haddock -h -oChasingBottoms/docs
 tar zcvf ChasingBottoms/chasing-bottoms.tar.gz ChasingBottoms/*hs ChasingBottoms/docs/*
