@@ -171,6 +171,24 @@ data M1 a = M11 a | M12 (M2 a) deriving (Typeable, Data)
 data M2 a = M21 (M1 a) | M22 a deriving (Typeable, Data)
 
 {-
+
+M1 a = fst (mu GH_a)
+M2 a = snd (mu GH_a)
+
+GH_a rec@(r1,r2) = (Lift (a + r2), Lift (r1 + a))
+
+in :: GH_a (mu GH_a) --> mu GH_a
+out:: GH_a (mu GH_a) <-- mu GH_a
+
+--map_GH_a :: (a1->b1,a2->b2) -> GH_a (a1,a2) --> GH_a (b1,b2)
+map_GH_a :: ((a1,a2)-->(b1,b2)) -> (GH_a (a1,a2) --> GH_a (b1,b2))
+
+approx_muGH   :: Nat -> (mu GH_a --> mu GH_a)
+approx_muGH n = in_GH_a . map_GH_a (approx_muGH (pred n)) . out_GH_a
+
+
+
+
  Functor: F (G, H) a = (Lift (a + H a), Lift (G a + a))
           (M1 a, M2 a) = mu F a = F (mu F) a
 
