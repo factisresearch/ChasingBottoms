@@ -32,7 +32,7 @@ import qualified Control.Exception as E
 data Result a
   = Value a
   | NonTermination
-  | Exception Control.Exception.Exception
+  | Exception E.Exception
     deriving (Eq, Show, Typeable)
 
 -- | @'timeOut' n c@ runs @c@ for at most @n@ seconds (modulo
