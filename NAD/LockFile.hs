@@ -1,6 +1,8 @@
 module NAD.LockFile
   ( lockFile
   -- , lockReadWrite
+  , createLockFile
+  , lockLockFile
   ) where
 
 import System.IO
@@ -28,6 +30,30 @@ lockFile fd comp = do
   a <- comp
   waitToSetLock fd (Unlock, AbsoluteSeek, 0, 0)
   return a
+
+-- | @'lockLockFile' file comp@ opens and locks @file@, runs @comp@,
+-- closes @file@, and returns the result of @comp@. This can be useful
+-- if @file@ is a lock file. If @file@ does not exist an exception is
+-- thrown.
+
+lockLockFile :: FilePath -> IO a -> IO a
+lockLockFile file comp = do
+  fd <- openFd file WriteOnly Nothing defaultFileFlags 
+  a <- lockFile fd comp
+  closeFd fd
+  return a
+
+-- | @'createLockFile' file@ does nothing if @file@ exists and
+-- otherwise creates @file@ with the following permissions set:
+--   * Owner write permission.
+--   * Mandatory file locking.
+
+createLockFile :: FilePath -> IO LockFile
+createLockFile file = do
+  ex <- doesFileExist file
+  unless ex $
+    writeFile file ""
+    setFileMode file (setGroupIDMode `unionFileModes` ownerWriteMode)
 
 -- | @'lockReadWrite' append file comp@ opens @file@, locks it, reads
 -- its contents, runs @comp@ on the contents, writes the string
