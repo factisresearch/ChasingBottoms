@@ -77,6 +77,7 @@ createLockFile file = do
 --     -- Handle possible errors.
 --   closeFd fd
 
+------------------------------------------------------------------------
 -- Tests.
 
 main = do
