@@ -12,8 +12,17 @@
 -- When dealing with \"hard bottoms\", i.e. non-terminating
 -- computations that do not result in exceptions, the following functions
 -- may be handy.
+--
+-- Note that a computation is considered to have terminated when it
+-- has reached weak head normal form (i.e. something distinct from
+-- bottom).
 
-module ChasingBottoms.TimeOut( timeOut, timeOutMicro ) where
+module ChasingBottoms.TimeOut
+  ( timeOut
+  , timeOut'
+  , timeOutMicro
+  , timeOutMicro'
+  ) where
 
 import Control.Concurrent
 import Control.Exception
@@ -44,3 +53,23 @@ timeOutMicro delay io = do
     killThread ioThread
     return Nothing)
     `finally` killThread reaper
+
+-- | 'timeOut'' is a variant which can be used for pure
+-- computations. The definition,
+--
+-- @
+--   'timeOut'' n = 'timeOut' n . Control.Exception.evaluate
+-- @
+--
+-- ensures that @'timeOut'' 1 bottom@ usually returns 'Nothing'.
+-- (@'timeOut' 1 (return bottom)@ usually returns @'Just' 'bottom'@.)
+timeOut' :: Int -> a -> IO (Maybe a)
+timeOut' n = timeOut n . evaluate
+
+-- | 'timeOutMicro'' is the equivalent variant of 'timeOutMicro':
+--
+-- @
+--  'timeOutMicro'' n = 'timeOutMicro' n . Control.Exception.evaluate
+-- @
+timeOutMicro' :: Int -> a -> IO (Maybe a)
+timeOutMicro' n = timeOutMicro n . evaluate
