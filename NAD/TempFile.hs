@@ -1,5 +1,9 @@
 {-# OPTIONS -fffi #-}
 
+-- | Note that 'tempFileName' is recommended under Solaris, whereas
+-- 'System.Posix.mkstemp' is recommended under Linux. Remember to set
+-- the umask in a suitable way before running these functions.
+
 module NAD.TempFile
   ( tempFile
   , tempFilename
