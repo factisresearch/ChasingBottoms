@@ -27,7 +27,7 @@ class ApproxShow a where
   --
   --   * All detectable occurences of bottoms are replaced by @\"_|_\"@.
   --
-  --   * Functions are displayed as @\"\<function\>\"@.
+  --   * Non-bottom functions are displayed as @\"\<function \/= _|_\>\"@.
   -- 
   approxShowsPrec :: Nat -> Prec -> a -> ShowS
   approxShows     :: Nat -> a -> ShowS
@@ -56,7 +56,7 @@ gShowsPrec :: Data a => Bool -> Nat -> Prec -> a -> ShowS
 gShowsPrec insideList n p (a :: a)
   | n == 0       = showString "_"
   | isBottom a   = showString "_|_"
-  | isFunction a = showString "<function>"
+  | isFunction a = showString "<function /= _|_>"
   | isTuple a    = showParen True $ drive $
                     List.intersperse (showString ", ") $
                      (continueR (:) [] minPrec a)
