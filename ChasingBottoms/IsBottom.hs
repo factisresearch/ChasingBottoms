@@ -11,7 +11,9 @@ import Array
 -- | @'isBottom' a@ returns 'False' if @a@ is distinct from bottom. If
 -- @a@ equals bottom and results in an exception which is caught by
 -- 'isBottom', and this exception is of a certain kind (see below),
--- then @'isBottom' a = 'True'@.
+-- then @'isBottom' a = 'True'@. Other caught exceptions are
+-- re-thrown. If @a@ never reaches a weak head normal form and
+-- never throws an exception, then @'isBottom' a@ never terminates.
 --
 -- The exceptions that yield 'True' are those that correspond to \"pure
 -- bottoms\", i.e. bottoms that can originate in pure code. Assertions
