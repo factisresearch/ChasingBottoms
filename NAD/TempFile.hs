@@ -1,6 +1,6 @@
 {-# OPTIONS -fffi #-}
 
-module TempFile
+module NAD.TempFile
   ( tempFile
   , tempFilename
   ) where
