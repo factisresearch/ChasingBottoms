@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mkdir docs
+cd ..
+haddock -h -oChasingBottoms/docs ChasingBottoms/*hs
+tar zcvf chasing-bottoms.tar.gz ChasingBottoms/*hs ChasingBottoms/docs/*
