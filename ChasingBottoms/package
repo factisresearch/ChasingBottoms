@@ -2,7 +2,7 @@
 
 mkdir -p docs && \
 cd .. && \
-ls ChasingBottoms.hs ChasingBottoms/*hs | grep -v '/IsType.hs$' | \
+ls ChasingBottoms.hs ChasingBottoms/*hs | grep -v '/IsType.hs$\|/Tests.hs$' | \
   xargs haddock -h --title="Chasing Bottoms" --prologue=ChasingBottoms/Header \
   -oChasingBottoms/docs \
   && \
