@@ -1,5 +1,6 @@
 module NAD.LockFile
   ( lockFile
+  -- , lockReadWrite
   ) where
 
 import System.IO
@@ -11,8 +12,9 @@ import System.Posix.Unistd
 -- | @'lockFile' fd comp@ blocks until a write lock has been aquired
 -- for @fd@, then performs @comp@, and finally releases the lock.
 --
--- Note that other processes are free to do whatever they want with
--- the file, except that they cannot obtain a lock of their own.
+-- Note that, unless mandatory locking is set on the file, other
+-- processes are free to do whatever they want with it, except that
+-- they cannot obtain a lock of their own.
 --
 -- The file descriptor must have been opened with write access,
 -- otherwise an exception will occur. Locks are not inherited by
@@ -26,6 +28,28 @@ lockFile fd comp = do
   a <- comp
   waitToSetLock fd (Unlock, AbsoluteSeek, 0, 0)
   return a
+
+-- | @'lockReadWrite' append file comp@ opens @file@, locks it, reads
+-- its contents, runs @comp@ on the contents, writes the string
+-- returned from @comp@ to the file, and finally unlocks the file. If
+-- @append@ is 'True', then the output is appended to the original
+-- contents of the file, and otherwise the original contents are
+-- discarded.
+
+-- lockReadWrite :: Bool -> FilePath -> (String -> IO String) -> IO ()
+-- lockReadWrite append file comp = do
+--   h <- openFile file ReadWriteMode
+--   fd <- handleToFd h
+--   lockFile fd $ do
+--     s <- readEntireFile fd
+--     s' <- comp s
+--     when (not append) $ do
+--       fdSeek fd AbsoluteSeek 0
+--       -- Erase file.
+--       ...
+--     fdWrite fd s'
+--     -- Handle possible errors.
+--   closeFd fd
 
 -- Tests.
 
