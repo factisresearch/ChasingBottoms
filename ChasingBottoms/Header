@@ -69,3 +69,5 @@ ported to other Haskell compilers, but that would require some work. The
 @TimeOut@ functions require preemptive scheduling, and most of the
 rest requires @Data.Generics@; @isBottom@ only requires exceptions,
 though.
+
+Source code: <http://www.cs.chalmers.se/~nad/software/ChasingBottoms/chasing-bottoms.tar.gz>.
