@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
+{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -fallow-overlapping-instances #-}
 
 -- | Generic semantic equality and order. The semantic order referred
 -- to is that of a typical CPO for Haskell types, where e.g. @('True',
@@ -8,6 +8,10 @@
 -- The implementation is based on 'isBottom', and has the same
 -- limitations. Note that non-bottom functions are not handled by any
 -- of the functions described below.
+--
+-- One could imagine using QuickCheck for testing equality of
+-- functions, but I have not managed to tweak the type system so that
+-- it can be done transparently.
 
 module ChasingBottoms.SemanticOrd
   ( SemanticEq(..)
@@ -18,6 +22,9 @@ import Data.Generics
 import ChasingBottoms.IsBottom
 import ChasingBottoms.IsType
 import qualified Maybe
+
+import Debug.QuickCheck
+import ChasingBottoms.QuickCheckWrapper
 
 infix 4 <!, <=!, ==!, >=!, >!, /=!
 
@@ -93,6 +100,7 @@ allOK op a b =
   -- It's really enough to test just a, since we restrict the types
   -- above, but why complicate things?
   if isFunction a || isFunction b then
+    -- cast' a `fop` cast' b
     error "The generic versions of (==!) and friends do not accept non-bottom \
           \functions."
    else
@@ -106,6 +114,13 @@ a =^= b = toConstr a == toConstr b
 -- Check children.
 childrenOK :: Rel -> Rel
 childrenOK op = tmapQl (&&) True op
+
+------------------------------------------------------------------------
+
+-- Variant of cast.
+
+cast' :: (Typeable a, Typeable b) => a -> b
+cast' = Maybe.fromJust . cast
 
 ------------------------------------------------------------------------
 
@@ -136,14 +151,44 @@ a \/!! (b :: b) =
 
 -- TODO: Implement a comparison operator which also works for functions.
 
-(===!) :: Arbitrary a => (a -> b) -> (a -> b) -> Bool
-f ===! g = case (isBottom f, isBottom g) of
-  (True, True)   -> True
-  (False, False) -> 
-    forAll arbitrary $ \x -> f x ==! g x
-  _              -> False
+-- newtype EqFun = EqFun { unEqFun ::
+--   forall a b . (Data a, Data b) => a -> b -> Bool }
 
-forAll 
+class SemanticFunEq a where
+  (!==!), (!/=!) :: a -> a -> Bool
+
+  (!/=!) = \x y -> not (x !==! y)
+
+-- instance Data a => SemanticFunEq a where
+--  x !==! y =
+--   let test :: (Arbitrary b, Show b, Data c) =>
+--               (b -> c1) -> (b -> c2) -> Bool
+--       test f g = testIt (forAll arbitrary $ \(x :: b) -> f x !==!! g x)
+--   in let ?funTest = EqFun test
+--   in x !==!! y
+
+-- (!==!!) :: (Data a, Data b, ?funTest :: EqFun) => a -> b -> Bool
+-- x !==!! y = case (isBottom x, isBottom y) of
+--   (True, True)   -> True
+--   (False, False) | isFunction x -> unEqFun ?funTest x y
+--                  | otherwise -> x =^= y && tmapQl (&&) True (!==!!) x y
+--   _              -> False
+
+-- This one works, but it only handles functions on the top level, not
+-- functions inside e.g. lists.
+
+instance (Show a, Arbitrary a, SemanticFunEq b) => SemanticFunEq (a -> b) where
+  f !==! g = case (isBottom f, isBottom g) of
+    (True, True)   -> True
+    (False, False) -> testIt (forAll arbitrary $ \x -> f x !==! g x)
+    _              -> False
+
+instance SemanticEq a => SemanticFunEq a where
+  a !==! b = case (isBottom a, isBottom b) of
+    (True, True)   -> True
+    (False, False) -> -- We know that we are not dealing with functions.
+                      a ==! b
+    _              -> False
 
 ------------------------------------------------------------------------
 -- Tests
