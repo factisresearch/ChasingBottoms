@@ -32,17 +32,20 @@ import qualified Control.Exception as E
 data Result a
   = Value a
   | NonTermination
-  | Exception E.Exception
+  | Exception Control.Exception.Exception
     deriving (Eq, Show, Typeable)
 
 -- | @'timeOut' n c@ runs @c@ for at most @n@ seconds (modulo
---   scheduling issues).
+-- scheduling issues).
+--
 --   * If the computation terminates before that, then
 --     @'Value' v@ is returned, where @v@ is the resulting value. Note
 --     that this value may be equal to bottom, e.g. if @c = 'return'
---     'bottom'@.
+--     'ChasingBottoms.IsBottom.bottom'@.
+--
 --   * If the computation does not terminate, then 'NonTermination' is
 --     returned.
+--
 --   * If the computation raises an exception, then @'Exception' e@ is
 --     returned, where @e@ is the exception.
 

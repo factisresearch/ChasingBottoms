@@ -7,7 +7,7 @@
 -- 
 -- Maintainer  :  http://www.cs.chalmers.se/~nad/
 -- Stability   :  experimental
--- Portability :  non-portable (exceptions)
+-- Portability :  non-portable (exceptions, implicit parameters)
 --
 
 module ChasingBottoms.IsBottom(isBottom, bottom, isBottomTimeOut) where
@@ -59,11 +59,11 @@ bottom = error "_|_"
 -- is 'Just lim', then computations taking more than 'lim' seconds are
 -- also considered to be equal to bottom. Note that this is a very
 -- crude approximation of what a bottom is. Also note that this
--- "function" may return different answers upon different
+-- \"function\" may return different answers upon different
 -- invocations. Take it for what it is worth.
 --
 -- 'isBottomTimeOut' is subject to all the same scheduling vagaries as
--- 'timeOut'.
+-- 'ChasingBottoms.TimeOut.timeOut'.
 
 isBottomTimeOut :: (?timeOutLimit :: Maybe Int) => a -> Bool
 isBottomTimeOut f = unsafePerformIO $
