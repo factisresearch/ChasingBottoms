@@ -1,6 +1,15 @@
 {-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
 
--- | Functions for converting arbitrary (non-function, partial,
+-- |
+-- Module      :  ChasingBottoms.ApproxShow
+-- Copyright   :  (c) Nils Anders Danielsson 2004
+-- License     :  See the file LICENSE.
+-- 
+-- Maintainer  :  http://www.cs.chalmers.se/~nad/
+-- Stability   :  experimental
+-- Portability :  non-portable (GHC-specific)
+--
+-- Functions for converting arbitrary (non-function, partial,
 -- possibly infinite) values into strings.
 
 module ChasingBottoms.ApproxShow

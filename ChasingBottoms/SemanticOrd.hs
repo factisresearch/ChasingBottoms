@@ -1,6 +1,15 @@
 {-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
 
--- | Generic semantic equality and order. The semantic order referred
+-- |
+-- Module      :  ChasingBottoms.SemanticOrd
+-- Copyright   :  (c) Nils Anders Danielsson 2004
+-- License     :  See the file LICENSE.
+-- 
+-- Maintainer  :  http://www.cs.chalmers.se/~nad/
+-- Stability   :  experimental
+-- Portability :  non-portable (GHC-specific)
+--
+-- Generic semantic equality and order. The semantic order referred
 -- to is that of a typical CPO for Haskell types, where e.g. @('True',
 -- 'bottom') '<=!' ('True', 'False')@, but where @('True', 'True')@
 -- and @('True', 'False')@ are incomparable.

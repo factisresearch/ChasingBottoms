@@ -11,6 +11,8 @@ can do the tests as simply as the following examples show.
 
 Testing explicitly for bottoms:
 
+  [@> isBottom (head [\])@] @True@
+
   [@> isBottom bottom@] @True@
 
   [@> isBottom (\\_ -> bottom)@] @False@
@@ -64,6 +66,6 @@ Verification in the Presence of Partial and Infinite Values\"
 
 The code is developed and tested under GHC. Most parts can probably be
 ported to other Haskell compilers, but that would require some work. The
-@TimeOut@ functions require preemptive multitasking, and most of the
-rest requires @Data.Generics@; @isBottom@ only requires asynchronous
-exceptions, though.
+@TimeOut@ functions require preemptive scheduling, and most of the
+rest requires @Data.Generics@; @isBottom@ only requires exceptions,
+though.

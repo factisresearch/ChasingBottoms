@@ -1,4 +1,13 @@
--- | This module just re-exports all the other modules.
+-- |
+-- Module      :  ChasingBottoms
+-- Copyright   :  (c) Nils Anders Danielsson 2004
+-- License     :  See the file LICENSE.
+-- 
+-- Maintainer  :  http://www.cs.chalmers.se/~nad/
+-- Stability   :  experimental
+-- Portability :  non-portable (GHC-specific)
+--
+-- This module just re-exports all the other modules.
 
 module ChasingBottoms
   ( module ChasingBottoms.Approx

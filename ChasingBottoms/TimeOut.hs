@@ -1,6 +1,15 @@
 {-# OPTIONS -fglasgow-exts #-}
 
--- | When dealing with \"hard bottoms\", i.e. non-terminating
+-- |
+-- Module      :  ChasingBottoms.TimeOut
+-- Copyright   :  (c) Nils Anders Danielsson 2004
+-- License     :  See the file LICENSE.
+-- 
+-- Maintainer  :  http://www.cs.chalmers.se/~nad/
+-- Stability   :  experimental
+-- Portability :  non-portable (preemptive scheduling)
+--
+-- When dealing with \"hard bottoms\", i.e. non-terminating
 -- computations that do not result in exceptions, the following functions
 -- may be handy.
 

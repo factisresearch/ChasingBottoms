@@ -1,3 +1,13 @@
+-- |
+-- Module      :  ChasingBottoms.IsBottom
+-- Copyright   :  (c) Nils Anders Danielsson 2004
+-- License     :  See the file LICENSE.
+-- 
+-- Maintainer  :  http://www.cs.chalmers.se/~nad/
+-- Stability   :  experimental
+-- Portability :  non-portable (exceptions)
+--
+
 module ChasingBottoms.IsBottom(isBottom, bottom) where
 
 import Prelude hiding (catch)

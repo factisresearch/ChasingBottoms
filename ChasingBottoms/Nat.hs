@@ -1,6 +1,16 @@
--- | A simple implementation of natural numbers on top of 'Integer's.
+-- |
+-- Module      :  ChasingBottoms.Nat
+-- Copyright   :  (c) Nils Anders Danielsson 2004
+-- License     :  See the file LICENSE.
+-- 
+-- Maintainer  :  http://www.cs.chalmers.se/~nad/
+-- Stability   :  experimental
+-- Portability :  portable
+--
+-- A simple implementation of natural numbers on top of 'Integer's.
 -- Note that since 'Integer's are used there is no infinite natural
 -- number; in other words, 'succ' is strict.
+
 module ChasingBottoms.Nat(Nat, isSucc, fromSucc, natrec, foldN) where
 
 -- TODO: Proper tests.

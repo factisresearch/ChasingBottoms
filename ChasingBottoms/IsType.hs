@@ -1,4 +1,13 @@
--- | Internal helper functions.
+-- |
+-- Module      :  ChasingBottoms.IsType
+-- Copyright   :  (c) Nils Anders Danielsson 2004
+-- License     :  See the file LICENSE.
+-- 
+-- Maintainer  :  http://www.cs.chalmers.se/~nad/
+-- Stability   :  experimental
+-- Portability :  non-portable (GHC-specific)
+--
+-- Internal helper functions.
 
 module ChasingBottoms.IsType( isFunction, isTuple, isList, isString ) where
 
