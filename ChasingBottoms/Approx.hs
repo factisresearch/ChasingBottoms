@@ -144,10 +144,14 @@ out_PT x = case x of
   PL t  -> Left t
   PB tt -> Right tt
 
+-- Type annotations added just for clarity.
 map_PT :: (forall t . g t -> g' t) -> F g t -> F g' t
-map_PT f x = case x of
+map_PT (f :: forall t . g t -> g' t) (x :: F g t) = case x of
   Left t   -> Left t
-  Right tt -> Right (f tt)
+  Right tt -> Right ((f :: g (t, t) -> g' (t, t)) tt)
+
+fullMap_PT :: (forall a . a -> a) -> PerfectTree a -> PerfectTree a
+fullMap_PT f = in_PT . map_PT (fullMap_PT f) . out_PT
 
 -- And now we can define approx for this type:
 
@@ -160,28 +164,52 @@ approx_PT n | n == 0    = error "approx 0 == _|_"
 data A a b = A0 a | A1 b deriving (Typeable, Data)
 data C a b = C0 (C a b) | C1 a b deriving (Typeable, Data)
 
--- Mutually recursive types:
+-- -- Mutually recursive types:
 
 data M1 a = M11 a | M12 (M2 a) deriving (Typeable, Data)
 data M2 a = M21 (M1 a) | M22 a deriving (Typeable, Data)
 
---   M1 A = Lift (A + M2 A)
---   M2 A = Lift (M1 A + A)
+{-
+ Functor: F (G, H) a = (Lift (a + H a), Lift (G a + a))
+          (M1 a, M2 a) = mu F a = F (mu F) a
 
--- Functor: F1 G A = Lift (A + G A)
---          F2 G A = Lift (G A + A)
---          F G = F1 (F2 (fst G)) x F2 (F1 (snd G))
---          M1 x M2 = mu F
+  in  :: F (mu F) a -> (mu F) a
+  out :: (mu F) a -> F (mu F) a
 
---  in  :: F (mu F) a -> (mu F) a
---  in  :: F (M1 x M2) a -> (M1 x M2) a
---  out :: (mu F) a -> F (mu F) a
---  map :: (forall a . (G1 a -> G1' a, G2 a -> G2' a))
---         -> F G1 G2 a -> F G1' G2' a
+ F is a functor : C^C x C^C -> (C x C)^C.
+ (Here C is the base category consisting of monomorphic "Haskell"
+ types and functions.)
+
+ Hence given an arrow (natural transformation) : (G, H) -> (G', H')
+ (G, G', H and H' objects (functors) in C^C) F yields an arrow
+ (natural transformation) : F (G, H) -> F (G', H').
+
+ What is an arrow in C^C x C^C? It is a pair of arrows, both in C^C,
+ i.e. two natural transformations on functors in C.
+
+ Hence, a natural transformation : (G, H) -> (G', H') is, for each
+ object (type) a, a pair of arrows (functions)
+ : (G a -> G' a, H a -> H' a).
+
+ In other words we have
+  map :: (forall a . (G a -> G' a, H a -> H' a))
+      -> (forall a . F (G, H) a -> F (G', H') a)
+
+ I'm not sure if this is how one usually defines map for a mutually
+ recursive type, but it seems reasonable. However, I'm not sure
+ exactly how one should go about defining approx using the above
+ map. The standard definition from the article isn't applicable.
+
+ Note that I never state in the documentation that mutually recursive
+ types are handled incorrectly (since I don't know for sure what the
+ correct behaviour is), but I don't think that they are, as the tests
+ below show.
+-}
 
 -- The following is an approximation, since we don't have proper
 -- products.
-type F' g1 g2 a = (Either a (Either (g1 a) a), Either (Either a (g2 a)) a)
+type F' g h a = (Either a (h a), Either (g a) a)
+type Pair g h a = (g a, h a)
 type M a = (M1 a, M2 a)
 
 inn' :: F' M1 M2 a -> M a
@@ -190,12 +218,10 @@ inn' x = (m1, m2)
   (x1, x2) = x
   m1 = case x1 of
     Left a -> M11 a
-    Right (Left m)  -> M12 (M21 m)
-    Right (Right a) -> M12 (M22 a)
+    Right m  -> M12 m
   m2 = case x2 of
+    Left m  -> M21 m
     Right a -> M22 a
-    Left (Right m) -> M21 (M12 m)
-    Left (Left a)  -> M21 (M11 a)
 
 out' :: M a -> F' M1 M2 a
 out' m = (x1, x2)
@@ -203,29 +229,78 @@ out' m = (x1, x2)
   (m1, m2) = m
   x1 = case m1 of
     M11 a -> Left a
-    M12 (M21 m) -> Right (Left m)
-    M12 (M22 a) -> Right (Right a)
+    M12 m -> Right m
   x2 = case m2 of
+    M21 m -> Left m
     M22 a -> Right a
-    M21 (M12 m) -> Left (Right m)
-    M21 (M11 a) -> Left (Left a)
 
-map' :: (forall a . (g1 a -> g1' a, g2 a -> g2' a))
-        -> F' g1 g2 a -> F' g1' g2' a
+map' :: (forall a . (g a -> g' a, h a -> h' a))
+        -> F' g h a -> F' g' h' a
 map' f (x1, x2) = (x1', x2')
   where
-  x1' = let f1 = fst f in case x1 of
+  (g, h) = f
+  x1' = case x1 of
     Left a -> Left a
-    Right (Left m) -> Right (Left (f1 m))
-    Right (Right a) -> Right (Right a)
-  x2' = let f2 = snd f in case x2 of
+    Right m -> Right (h m)
+  x2' = case x2 of
     Right a -> Right a
-    Left (Right m) -> Left (Right (f2 m))
-    Left (Left a)  -> Left (Left a)
+    Left m  -> Left (g m)
 
+approx_M :: Nat -> M a -> M a
+approx_M n | n == 0    = error "approx 0 == _|_"
+           | otherwise =
+               inn' . map' (approx_M1 (pred n), approx_M2 (pred n)) . out'
+
+approx_M1 :: Nat -> M1 a -> M1 a
+approx_M1 n x | n /= 0 = fst (approx_M n (x, undefined))
+approx_M2 :: Nat -> M2 a -> M2 a
+approx_M2 n x | n /= 0 = snd (approx_M n (undefined, x))
+
+approx1 :: Nat -> M1 a -> M1 a
+approx1 n | n == 0    = error "approx 0 == _|_"
+          | otherwise = \x -> fst $
+  (inn' . map' (approx1 (pred n), approx2 (pred n)) . out') (x, undefined)
+approx2 :: Nat -> M2 a -> M2 a
+approx2 n | n == 0    = error "approx 0 == _|_"
+          | otherwise = \x -> snd $
+  (inn' . map' (approx1 (pred n), approx2 (pred n)) . out') (undefined, x)
+
+-- Another variant.
+map'' :: (forall a . Pair g h a -> Pair g' h' a) -> F' g h a -> F' g' h' a
+map'' f (x1, x2) = (x1', x2')
+  where
+  x1' = case x1 of
+    Left a -> Left a
+    Right m -> Right (snd $ f (undefined, m))
+  x2' = case x2 of
+    Right a -> Right a
+    Left m  -> Left (fst $ f (m, undefined))
+
+approx_M' :: Nat -> M a -> M a
+approx_M' n | n == 0    = error "approx 0 == _|_"
+            | otherwise = inn' . map'' (approx_M' (pred n)) . out'
+
+-- Without the extra test we would have
+-- approx1' 0 /=! bottom, but approx1 0 ==! bottom.
 approx1' :: Nat -> M1 a -> M1 a
-approx' n | n == 0    = error "approx 0 == _|_"
-          | otherwise = inn' . map' (approx' (pred n)) . out'
+approx1' n | n /= 0 = \x -> fst (approx_M' n (x, undefined))
+approx2' :: Nat -> M2 a -> M2 a
+approx2' n | n /= 0 = \x -> snd (approx_M' n (undefined, x))
+
+-- Direct definition:
+approx_M1' :: Nat -> M1 a -> M1 a
+approx_M1' n | n == 0    = error "approx 0 == _|_"
+             | otherwise = \m -> case m of
+  M11 _ -> m
+  M12 m -> M12 (approx_M2' (pred n) m)
+approx_M2' :: Nat -> M2 a -> M2 a
+approx_M2' n | n == 0    = error "approx 0 == _|_"
+             | otherwise = \m -> case m of
+  M21 m -> M21 (approx_M1' (pred n) m)
+  M22 _ -> m
+
+m1 = M12 (M21 (M12 (M22 'a')))
+m2 = M21 (M12 (M21 (M11 'b')))
 
 tests =
     -- approx 0 = bottom.
@@ -260,14 +335,24 @@ tests =
 
     -- approxAll doesn't descend only on the original type...
   , approxAll 1 (Just (Just (Just True))) ==! (Just bottom)
+  , approxAll 2 pTree ==! approx_PT 2 pTree
+  , approxAll 2 m1 ==! approx1 2 m1
 
     -- ...but approx does...
   , approx 1 (Just (Just (Just True))) ==! (Just (Just (Just True)))
 
     -- ...more or less:
   , approx 2 pTree /=! approx_PT 2 pTree
-    -- Note that a perfect implementation would have an equality
-    -- here.
+  , approx 2 m1    /=! approx1 2 m1
+    -- Note that a perfect implementation would have equalities here.
+
+    -- All the approxes for Ms are equivalent:
+  , approx1   3 m1 ==! approx1'   3 m1
+  , approx1'  3 m1 ==! approx_M1  3 m1
+  , approx_M1 3 m1 ==! approx_M1' 3 m1
+  , approx2   3 m2 ==! approx2'   3 m2
+  , approx2'  3 m2 ==! approx_M2  3 m2
+  , approx_M2 3 m2 ==! approx_M2' 3 m2
   ]
 
 testsOK = and tests
