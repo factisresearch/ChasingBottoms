@@ -19,9 +19,11 @@ Gibbons, Information Processing Letters, 79(4):197-201, Elsevier
 Science, August 2001, <http://www.cs.nott.ac.uk/~gmh/bib.html>.
 
 Instances are provided for all members of the 'Data' type class.  Note
-that the implementation is only guaranteed to perform correctly (with
-respect to the paper) on polynomial datatypes; in particular, nested
-or mutually recursive types are not handled correctly.
+that the implementation is only guaranteed to perform correctly, with
+respect to the paper (and modulo any bugs), on polynomial datatypes;
+in particular, nested or mutually recursive types are not handled
+correctly (with respect to the paper). The specification below is
+correct, though.
 
 In practice the 'approxAll' function can probably be more useful than
 'approx'. It traverses down /all/ subterms, and it should be possible

@@ -136,11 +136,14 @@ a \/!! (b :: b) =
 
 -- TODO: Implement a comparison operator which also works for functions.
 
--- f ===! g = case (isBottom f, isBottom g) of
---   (True, True)   -> property True
---   (False, False) -> forAll arbitrary $ \x ->
---     f x ==! g x
---   _              -> property False
+(===!) :: Arbitrary a => (a -> b) -> (a -> b) -> Bool
+f ===! g = case (isBottom f, isBottom g) of
+  (True, True)   -> True
+  (False, False) -> 
+    forAll arbitrary $ \x -> f x ==! g x
+  _              -> False
+
+forAll 
 
 ------------------------------------------------------------------------
 -- Tests
