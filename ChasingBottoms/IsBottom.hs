@@ -1,3 +1,5 @@
+{-# OPTIONS -fimplicit-params #-}
+
 -- |
 -- Module      :  ChasingBottoms.IsBottom
 -- Copyright   :  (c) Nils Anders Danielsson 2004
@@ -8,11 +10,12 @@
 -- Portability :  non-portable (exceptions)
 --
 
-module ChasingBottoms.IsBottom(isBottom, bottom) where
+module ChasingBottoms.IsBottom(isBottom, bottom, isBottomTimeOut) where
 
 import Prelude hiding (catch)
 import Control.Exception (catch, throw, Exception(..), evaluate)
 import System.IO.Unsafe (unsafePerformIO)
+import qualified ChasingBottoms.TimeOut as T
 
 -- For testing purposes:
 import System
@@ -45,8 +48,26 @@ import Array
 --   catch (evaluate undefined) (\e -> return ())  ==> return ()
 
 isBottom :: a -> Bool
-isBottom f = unsafePerformIO $
-  (evaluate f >> return False) `catch` \e -> case e of
+isBottom = let ?timeOutLimit = Nothing in isBottomTimeOut
+
+-- | 'bottom' generates a bottom that is suitable for testing using
+-- 'isBottom'.
+bottom :: a
+bottom = error "_|_"
+
+-- | 'isBottomTimeOut' works like 'isBottom', but if '?timeOutLimit'
+-- is 'Just lim', then computations taking more than 'lim' seconds are
+-- also considered to be equal to bottom. Note that this is a very
+-- crude approximation of what a bottom is. Also note that this
+-- "function" may return different answers upon different
+-- invocations. Take it for what it is worth.
+--
+-- 'isBottomTimeOut' is subject to all the same scheduling vagaries as
+-- 'timeOut'.
+
+isBottomTimeOut :: (?timeOutLimit :: Maybe Int) => a -> Bool
+isBottomTimeOut f = unsafePerformIO $
+  maybeTimeOut (evaluate f) `catch` \e -> case e of
     ArithException _   -> throw e
     ArrayException _   -> return True
     AssertionFailed _  -> throw e
@@ -63,76 +84,14 @@ isBottom f = unsafePerformIO $
     RecConError _      -> return True
     RecSelError _      -> return True
     RecUpdError _      -> return True
-
--- | 'bottom' generates a bottom that is suitable for testing using
--- 'isBottom'.
-bottom :: a
-bottom = error "_|_"
-
-
-------------------------------------------------------------------------
--- Tests
-
-isException f = unsafePerformIO $
-  (f `seq` return False) `catch` const (return True)
-
-bot = bot
-notbot x = notbot x
-
-data T a = L | B (T a) (T a) deriving Eq
-
--- instance Monad T where
-
-leftInfinite = B leftInfinite L
-
-infiniteRecursion = leftInfinite == leftInfinite
-
-data A = A { aaa :: A } | C { ccc :: A }
-
-tests = and
-    -- Basic cases.
-  [ isBottom bottom  ==  True
-  , isBottom undefined  ==  True
-  , isBottom (error "...")  ==  True
-    -- This sometimes leads to a stack overflow.
-    -- , isBottom bot  ==  True
-
-    -- const bottom /= bottom.
-  , isBottom notbot  ==  False
-  , isBottom (const bottom)  ==  False
-
-    -- Other types also lifted.
-  , isBottom (bottom, bottom)  ==  False
-  , isBottom (Just bottom)  ==  False
-
-    -- Pattern match failure.
-  , isBottom (let (x, y) = bottom in x :: Bool)  ==  True
-  , isBottom (let Just x = Nothing in x :: Char)  ==  True
-
-    -- Nonterminating, but not bottom.
-  , isBottom [1..]  ==  False
-
-    -- Missing methods.
-    -- Skip this test to avoid compiler warnings.
-    -- , (isBottom (L >> L))  ==  True
-
-    -- Array stuff.
-  , isBottom (array (1,0) [] ! 0)  ==  True
-  , isBottom (array (0,0) [] ! 0)  ==  True
-
-    -- Record stuff.
-    -- First one commented out to avoid compiler warnings.
-    -- , isBottom (let x = A {} in aaa x)  ==  True
-  , isBottom (let x = A { aaa = x } in ccc x)  ==  True
-  , isBottom (let x = A { aaa = x } in x { ccc = x })  ==  True
-
-    -- Infinite recursion, no data produced, should yield stack
-    -- overflow...
-    -- Not a quick test (on some machines, anyway). And the result
-    -- might be optimisation dependent.
-    -- , isException (isBottom infiniteRecursion)  ==  True
-
-    -- Some other exceptions that are not caught.
-  , isException (isBottom (unsafePerformIO $ exitWith ExitSuccess))  ==  True
-  , isException (isBottom (1 `div` 0))  ==  True
-  ]
+  where
+  maybeTimeOut io = case ?timeOutLimit of
+    Nothing -> do
+      io
+      return False
+    Just lim -> do
+      result <- T.timeOut lim io
+      case result of               -- Note that evaluate bottom /= bottom.
+        T.Value _        -> return False
+        T.NonTermination -> return True
+        T.Exception e    -> throw e  -- Catch the exception above.
