@@ -1,8 +1,13 @@
 {-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
 
--- | Generic semantic equality and order. The implementation is based
--- on 'isBottom', and has the same limitations. Note that non-bottom
--- functions are not handled by any of the functions described below.
+-- | Generic semantic equality and order. The semantic order referred
+-- to is that of a typical CPO for Haskell types, where e.g. @('True',
+-- 'bottom') '<=!' ('True', 'False')@, but where @('True', 'True')@
+-- and @('True', 'False')@ are incomparable.
+--
+-- The implementation is based on 'isBottom', and has the same
+-- limitations. Note that non-bottom functions are not handled by any
+-- of the functions described below.
 
 module ChasingBottoms.SemanticOrd
   ( SemanticEq(..)
@@ -12,7 +17,6 @@ module ChasingBottoms.SemanticOrd
 
 import Data.Generics
 import ChasingBottoms.IsBottom
--- import Debug.QuickCheck
 import ChasingBottoms.IsType
 import qualified Maybe
 
@@ -34,10 +38,6 @@ class SemanticEq a where
 -- | 'SemanticOrd' contains methods for testing whether two terms are
 -- related according to the semantic domain ordering.
 
--- We can't implement compare/min/max. Possible interesting
--- variations: lub, glb :: a -> a -> Maybe a, semanticCompare :: a ->
--- a -> Maybe Ordering.
-
 class SemanticEq a => SemanticOrd a where
   (<!), (<=!), (>=!), (>!) :: a -> a -> Bool
 
@@ -47,14 +47,14 @@ class SemanticEq a => SemanticOrd a where
   semanticCompare :: a -> a -> Maybe Ordering
 
   (\/!) :: a -> a -> Maybe a
-  -- | @x '\/!' y@ and @x '/\!' y@ compute the least upper and greatest
+  (/\!) :: a -> a -> a
+  -- ^ @x '\/!' y@ and @x '/\!' y@ compute the least upper and greatest
   -- lower bounds, respectively, of @x@ and @y@ in the semantical
   -- domain ordering. Note that the least upper bound may not always
   -- exist.
   -- This functionality was implemented just because it was
   -- possible (and to provide analogues of 'max' and 'min' in the 'Ord'
   -- class). If anyone finds any use for it, please let me know.
-  (/\!) :: a -> a -> a
 
   (>=!) = flip (<=!)
   (<!)  = \x y -> x <=! y && x /=! y
@@ -70,8 +70,8 @@ instance Data a => SemanticEq a where
 
 instance Data a => SemanticOrd a where
   (<=!) = (<=!!)
-  (/\!)  = \x y -> x /\!! y
-  (\/!)  = \x y -> x \/!! y
+  (/\!)  = (/\!!)
+  (\/!)  = (\/!!)
 
 ------------------------------------------------------------------------
 
@@ -115,9 +115,6 @@ a /\!! (b :: b) =
   if isBottom a || isBottom b then
     bottom
    else if isFunction a || isFunction b then
-    -- This should be possible, in some framework, but I don't know
-    -- how to do it just yet.
-    -- cast' (\x -> cast' a x /\!! cast' b x) :: b
     error "/\\! does not handle non-bottom functions."
    else if not (a =^= b) then
     bottom
@@ -132,39 +129,13 @@ a \/!! (b :: b) =
     (False, True)  -> cast a
     (False, False)
       | isFunction a || isFunction b ->
-          -- This should be possible, in some framework, but I don't
-          -- know how to do it.
-          -- cast (\x -> cast' a x \/! cast' b x) :: Maybe b
           error "\\/! does not handle non-bottom functions."
       | not (a =^= b)                -> Nothing
       | otherwise                    -> tmapM (\/!!) a b
 
-tmkM :: (Typeable a, Typeable b, Typeable c, Monad m) =>
-        (a -> b -> m b) -> a -> c -> m c
-tmkM f x y = mkM (f x) y
-
-cast' :: (Typeable a, Typeable b) => a -> b
-cast' = Maybe.fromJust . cast
-    
 ------------------------------------------------------------------------
 
 -- TODO: Implement a comparison operator which also works for functions.
-
--- GenericQ (GenericQ r) = forall a b . (Data a, Data b) => a -> b -> r
-
--- tmapQl :: (r -> r -> r) -> r -> GenericQ (GenericQ r) -> GenericQ (GenericQ r)
-
--- everywhere :: (forall a . Data a => a -> a) -> forall a . Data a => a -> a
--- everywhere f = f . gmapT (everywhere f)
-
--- gmapT :: Data a => (forall b . Data b => b -> b) -> a -> a
-
--- teverywhere :: (forall a . Data a => a -> a) ->
---                (forall a . Data a => a -> a) ->
---                forall a . Data a => a ->
---                forall a . Data a => a ->
---                a
--- teverywhere 
 
 -- f ===! g = case (isBottom f, isBottom g) of
 --   (True, True)   -> property True
