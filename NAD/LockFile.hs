@@ -5,10 +5,13 @@ module NAD.LockFile
   , lockLockFile
   ) where
 
+import Control.Monad
 import System.IO
+import System.Directory
 import System.Posix.IO
 import System.Posix.Types
 import System.Posix.Unistd
+import System.Posix.Files
 -- import Control.Concurrent
 
 -- | @'lockFile' fd comp@ blocks until a write lock has been aquired
@@ -48,10 +51,10 @@ lockLockFile file comp = do
 --   * Owner write permission.
 --   * Mandatory file locking.
 
-createLockFile :: FilePath -> IO LockFile
+createLockFile :: FilePath -> IO ()
 createLockFile file = do
   ex <- doesFileExist file
-  unless ex $
+  unless ex $ do
     writeFile file ""
     setFileMode file (setGroupIDMode `unionFileModes` ownerWriteMode)
 
