@@ -160,6 +160,73 @@ approx_PT n | n == 0    = error "approx 0 == _|_"
 data A a b = A0 a | A1 b deriving (Typeable, Data)
 data C a b = C0 (C a b) | C1 a b deriving (Typeable, Data)
 
+-- Mutually recursive types:
+
+data M1 a = M11 a | M12 (M2 a) deriving (Typeable, Data)
+data M2 a = M21 (M1 a) | M22 a deriving (Typeable, Data)
+
+--   M1 A = Lift (A + M2 A)
+--   M2 A = Lift (M1 A + A)
+
+-- Functor: F1 G A = Lift (A + G A)
+--          F2 G A = Lift (G A + A)
+--          F G = F1 (F2 (fst G)) x F2 (F1 (snd G))
+--          M1 x M2 = mu F
+
+--  in  :: F (mu F) a -> (mu F) a
+--  in  :: F (M1 x M2) a -> (M1 x M2) a
+--  out :: (mu F) a -> F (mu F) a
+--  map :: (forall a . (G1 a -> G1' a, G2 a -> G2' a))
+--         -> F G1 G2 a -> F G1' G2' a
+
+-- The following is an approximation, since we don't have proper
+-- products.
+type F' g1 g2 a = (Either a (Either (g1 a) a), Either (Either a (g2 a)) a)
+type M a = (M1 a, M2 a)
+
+inn' :: F' M1 M2 a -> M a
+inn' x = (m1, m2)
+  where
+  (x1, x2) = x
+  m1 = case x1 of
+    Left a -> M11 a
+    Right (Left m)  -> M12 (M21 m)
+    Right (Right a) -> M12 (M22 a)
+  m2 = case x2 of
+    Right a -> M22 a
+    Left (Right m) -> M21 (M12 m)
+    Left (Left a)  -> M21 (M11 a)
+
+out' :: M a -> F' M1 M2 a
+out' m = (x1, x2)
+  where
+  (m1, m2) = m
+  x1 = case m1 of
+    M11 a -> Left a
+    M12 (M21 m) -> Right (Left m)
+    M12 (M22 a) -> Right (Right a)
+  x2 = case m2 of
+    M22 a -> Right a
+    M21 (M12 m) -> Left (Right m)
+    M21 (M11 a) -> Left (Left a)
+
+map' :: (forall a . (g1 a -> g1' a, g2 a -> g2' a))
+        -> F' g1 g2 a -> F' g1' g2' a
+map' f (x1, x2) = (x1', x2')
+  where
+  x1' = let f1 = fst f in case x1 of
+    Left a -> Left a
+    Right (Left m) -> Right (Left (f1 m))
+    Right (Right a) -> Right (Right a)
+  x2' = let f2 = snd f in case x2 of
+    Right a -> Right a
+    Left (Right m) -> Left (Right (f2 m))
+    Left (Left a)  -> Left (Left a)
+
+approx1' :: Nat -> M1 a -> M1 a
+approx' n | n == 0    = error "approx 0 == _|_"
+          | otherwise = inn' . map' (approx' (pred n)) . out'
+
 tests =
     -- approx 0 = bottom.
   [ approx 0 ==! (bottom :: Int -> Int)
