@@ -3,6 +3,7 @@ module NAD.LockFile
   -- , lockReadWrite
   , createLockFile
   , lockLockFile
+  , createAndLock
   ) where
 
 import Control.Monad
@@ -13,6 +14,7 @@ import System.Posix.Types
 import System.Posix.Unistd
 import System.Posix.Files
 -- import Control.Concurrent
+import System.Random
 
 -- | @'lockFile' fd comp@ blocks until a write lock has been aquired
 -- for @fd@, then performs @comp@, and finally releases the lock.
@@ -49,6 +51,10 @@ lockLockFile file comp = do
 -- | @'createLockFile' file@ does nothing if @file@ exists and
 -- otherwise creates @file@ with the following permissions set:
 --   * Owner write permission.
+--   * Group write permission.
+
+-- Using mandatory file locking does not seem to work on our Solaris
+-- system. The files cannot even be opened...
 --   * Mandatory file locking.
 
 createLockFile :: FilePath -> IO ()
@@ -56,7 +62,16 @@ createLockFile file = do
   ex <- doesFileExist file
   unless ex $ do
     writeFile file ""
-    setFileMode file (setGroupIDMode `unionFileModes` ownerWriteMode)
+    setFileMode file (ownerWriteMode `unionFileModes` groupWriteMode)
+    -- setFileMode file (setGroupIDMode `unionFileModes` ownerWriteMode)
+
+-- | @'createAndLock' file comp@ first does a 'createLockFile' and
+-- then a 'lockLockFile'.
+
+createAndLock :: FilePath -> IO a -> IO a
+createAndLock file comp = do
+  createLockFile file
+  lockLockFile file comp
 
 -- | @'lockReadWrite' append file comp@ opens @file@, locks it, reads
 -- its contents, runs @comp@ on the contents, writes the string
@@ -94,3 +109,10 @@ doLock fd name =
     putStrLn $ "Lock aquired: " ++ name
     sleep 2
     putStrLn $ "Lock just about to be released: " ++ name
+
+main2 = do
+  n <- randomRIO (0,100) :: IO Int
+  createAndLock "apa.lock" $ do
+    putStrLn $ "Got lock: " ++ show n
+    sleep 1
+    putStrLn $ "Releasing lock: " ++ show n
