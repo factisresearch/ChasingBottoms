@@ -9,6 +9,7 @@ ls ChasingBottoms.hs ChasingBottoms/*hs | grep -v '/IsType.hs$' | \
 rm -rf chasing-bottoms && \
 mkdir -p chasing-bottoms && \
 cp -p ChasingBottoms/LICENSE chasing-bottoms && \
-( ls -d ChasingBottoms.hs ChasingBottoms/*hs ChasingBottoms/docs | \
+( ls -d ChasingBottoms.hs ChasingBottoms/*hs | \
   xargs -n 1 -i rsync -arR {} chasing-bottoms ) && \
+rsync -ar ChasingBottoms/docs chasing-bottoms && \
 tar zcvf ChasingBottoms/chasing-bottoms.tar.gz chasing-bottoms
