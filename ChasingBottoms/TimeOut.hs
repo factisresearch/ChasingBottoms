@@ -1,7 +1,7 @@
 {-# OPTIONS -fglasgow-exts #-}
 
 -- | When dealing with \"hard bottoms\", i.e. non-terminating
--- computations that do not result in bottoms, the following functions
+-- computations that do not result in exceptions, the following functions
 -- may be handy.
 
 module ChasingBottoms.TimeOut( timeOut, timeOutMicro ) where
