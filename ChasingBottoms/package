@@ -12,4 +12,5 @@ cp -p ChasingBottoms/LICENSE chasing-bottoms && \
 ( ls -d ChasingBottoms.hs ChasingBottoms/*hs | \
   xargs -n 1 -i rsync -arR {} chasing-bottoms ) && \
 rsync -ar ChasingBottoms/docs chasing-bottoms && \
-tar zcvf ChasingBottoms/chasing-bottoms.tar.gz chasing-bottoms
+tar zcvf ChasingBottoms/chasing-bottoms.tar.gz chasing-bottoms && \
+rm -rf chasing-bottoms
