@@ -19,8 +19,9 @@ import qualified List
 type Prec = Int
 
 class ApproxShow a where
-  -- | @'approxShowsPrec' n@ works like 'showsPrec' with the following
-  -- differences:
+  -- | The 'Data' instance of 'ApproxShow' makes sure that
+  -- @'approxShowsPrec' n@ behaves (more or less) like the derived
+  -- version of 'showsPrec', with the following differences:
   --
   --   * After @n@ levels of descent into a term the output is
   --     replaced by @\"_\"@.
@@ -28,6 +29,7 @@ class ApproxShow a where
   --   * All detectable occurences of bottoms are replaced by @\"_|_\"@.
   --
   --   * Functions are displayed as @\"\<function\>\"@.
+  -- 
   approxShowsPrec :: Nat -> Prec -> a -> ShowS
   approxShows     :: Nat -> a -> ShowS
   approxShow      :: Nat -> a -> String
@@ -41,13 +43,15 @@ instance Data a => ApproxShow a where
 -- This is a gigantic hack (due to special treatment of lists and
 -- strings). Now I realise how I should have written it:
 --   A wrapper taking care of n == 0 and bottoms.
---   A generic case treating ordinary data types plus tuples and functions.
---   Type specific extensions for lists and strings.
--- I doubt that it's possible to have a type specific extension that
--- works for all list types, though.
+--   A generic case treating ordinary data types
+--   Special cases (type specific extensions) for tuples, functions,
+--     lists and strings.
+-- I'm not sure if it's possible to have a type specific extension that
+-- works for, for instance, all list types, though. I guess that it
+-- would have to be monomorphic.
 --
--- Anyway, I don't have time improving this right now. All tests are
--- OK, so this should be fine.
+-- Anyway, I don't have time improving this right now. All tests go
+-- through, so this should be fine.
 
 gShowsPrec :: Data a => Bool -> Nat -> Prec -> a -> ShowS
 gShowsPrec insideList n p (a :: a)
@@ -107,11 +111,10 @@ nil            = showString ""
 f .^. g        = f . showChar ' ' . g
 appPrec        = 10
 minPrec        = 0
-              -- Remove the surrounding parentheses for infix constructors.
-              -- No, don't do that, see the Q test case below. For
-              -- lists it would have been correct, though.
-showCon a      = showString -- . (if isInfix a then tail . init else id)
-                 $ conString $ toConstr a
+-- Some infix constructors seem to have parentheses around them in
+-- their conString representations. Maybe something should be done about
+-- that. See the Q test case below, and compare with ordinary lists.
+showCon a      = showString $ conString $ toConstr a
 isAtom a       = glength a == 0
 isPrimitive a  = maxConIndex (dataTypeOf a) == 0 
 isInfix a      = if isPrimitive a then
