@@ -18,6 +18,18 @@
 -- limitations. Note that non-bottom functions are not handled by any
 -- of the functions described below.
 --
+-- Some functions take the implicit parameters @?approxDepth@ and
+-- @?timeOutLimit@. They have the following meaning:
+--
+-- [@'?approxDepth'@] If equal to @'Just' n@, an @'approxAll' n@ is
+-- performed on all arguments before doing whatever the function is
+-- supposed to be doing.
+--
+-- [@'?timeOutLimit'@] If equal to @'Just' n@, then all computations
+-- that take more than @n@ seconds to complete are considered to be
+-- equal to 'bottom'. This functionality is implemented using
+-- 'isBottomTimeOut'.
+--
 -- One could imagine using QuickCheck for testing equality of
 -- functions, but I have not managed to tweak the type system so that
 -- it can be done transparently.
@@ -31,8 +43,11 @@ import Data.Generics
 import ChasingBottoms.IsBottom
 import ChasingBottoms.IsType
 import qualified Maybe
+import ChasingBottoms.Nat
+import ChasingBottoms.Approx
 
 infix 4 <!, <=!, ==!, >=!, >!, /=!
+infix 4 <?, <=?, ==?, >=?, >?, /=?
 
 -- | 'SemanticEq' contains methods for testing whether two terms are
 -- semantically equal.
@@ -44,22 +59,42 @@ infix 4 <!, <=!, ==!, >=!, >!, /=!
 
 class SemanticEq a where
   (==!), (/=!) :: a -> a -> Bool
+  (==?), (/=?) :: ( ?approxDepth :: Maybe Nat
+                  , ?timeOutLimit :: Maybe Int
+                  ) => a -> a -> Bool
+
+  (/=?) = \x y -> not (x ==? y)
 
   (/=!) = \x y -> not (x ==! y)
+
+  (==!) = bindImpl (==?)
 
 -- | 'SemanticOrd' contains methods for testing whether two terms are
 -- related according to the semantic domain ordering.
 
 class SemanticEq a => SemanticOrd a where
   (<!), (<=!), (>=!), (>!) :: a -> a -> Bool
+  (<?), (<=?), (>=?), (>?) ::
+    ( ?approxDepth :: Maybe Nat
+    , ?timeOutLimit :: Maybe Int
+    ) => a -> a -> Bool
 
-  -- | @'semanticCompare' x y@ returns 'Nothing' if @x@ and @y@ are
+  semanticCompare :: a -> a -> Maybe Ordering
+  semanticCompare' :: ( ?approxDepth :: Maybe Nat
+                      , ?timeOutLimit :: Maybe Int
+                      ) => a -> a -> Maybe Ordering
+  -- ^ @'semanticCompare' x y@ returns 'Nothing' if @x@ and @y@ are
   -- incomparable, and @'Just' o@ otherwise, where @o :: 'Ordering'@
   -- represents the relation between @x@ and @y@.
-  semanticCompare :: a -> a -> Maybe Ordering
 
   (\/!) :: a -> a -> Maybe a
   (/\!) :: a -> a -> a
+  (\/?) :: ( ?approxDepth :: Maybe Nat
+           , ?timeOutLimit :: Maybe Int
+           ) => a -> a -> Maybe a
+  (/\?) :: ( ?approxDepth :: Maybe Nat
+           , ?timeOutLimit :: Maybe Int
+           ) => a -> a -> a
   -- ^ @x '\/!' y@ and @x '/\!' y@ compute the least upper and greatest
   -- lower bounds, respectively, of @x@ and @y@ in the semantical
   -- domain ordering. Note that the least upper bound may not always
@@ -72,33 +107,61 @@ class SemanticEq a => SemanticOrd a where
   (<!)  = \x y -> x <=! y && x /=! y
   (>!)  = \x y -> x >=! y && x /=! y
 
-  semanticCompare x y | x <!  y   = Just LT
-                      | x ==! y   = Just EQ
-                      | x >!  y   = Just GT
-                      | otherwise = Nothing
+  (>=?) = flip (<=?)
+  (<?)  = \x y -> x <=? y && x /=? y
+  (>?)  = \x y -> x >=? y && x /=? y
+
+  (<=!) = bindImpl (<=?)
+
+  semanticCompare = bindImpl semanticCompare'
+
+  semanticCompare' x y | x <?  y   = Just LT
+                       | x ==? y   = Just EQ
+                       | x >?  y   = Just GT
+                       | otherwise = Nothing
+
+  x <=? y = case semanticCompare' x y of
+    Just LT -> True
+    Just EQ -> True
+    _       -> False
+
+  (\/!) = bindImpl (\/?)
+
+  (/\!) = bindImpl (/\?)
 
 instance Data a => SemanticEq a where
-  (==!) = (==!!)
+  (==?) = liftAppr (==??)
 
 instance Data a => SemanticOrd a where
-  (<=!) = (<=!!)
-  (/\!)  = (/\!!)
-  (\/!)  = (\/!!)
+  (<=?) = liftAppr (<=??)
+  (/\?)  = liftAppr (/\??)
+  (\/?)  = liftAppr (\/??)
+
+liftAppr op x y = appr x `op` appr y
+  where appr = maybe id approxAll ?approxDepth
+
+-- Non-trivial type...
+
+bindImpl ::
+  (forall . (?approxDepth :: Maybe Nat, ?timeOutLimit :: Maybe Int) => a) -> a
+bindImpl f = let ?approxDepth = Nothing
+                 ?timeOutLimit = Nothing
+             in f
 
 ------------------------------------------------------------------------
 
-type Rel = (Data a, Data b) => a -> b -> Bool
+type Rel = (?timeOutLimit :: Maybe Int, Data a, Data b) => a -> b -> Bool
 
-(==!!), (<=!!) :: Rel
+(==??), (<=??) :: Rel
 
-a ==!! b = case (isBottom a, isBottom b) of
+a ==?? b = case (isBottomTimeOut a, isBottomTimeOut b) of
   (True, True)   -> True
-  (False, False) -> allOK (==!!) a b
+  (False, False) -> allOK (==??) a b
   _              -> False
 
-a <=!! b = case (isBottom a, isBottom b) of
+a <=?? b = case (isBottomTimeOut a, isBottomTimeOut b) of
   (True, _)      -> True
-  (False, False) -> allOK (<=!!) a b
+  (False, False) -> allOK (<=??) a b
   _              -> False
 
 allOK :: Rel -> Rel
@@ -123,20 +186,20 @@ childrenOK op = tmapQl (&&) True op
 
 ------------------------------------------------------------------------
 
-(/\!!) :: (Data a, Data b) => a -> b -> b
-a /\!! (b :: b) =
-  if isBottom a || isBottom b then
+(/\??) :: (?timeOutLimit :: Maybe Int, Data a, Data b) => a -> b -> b
+a /\?? (b :: b) =
+  if isBottomTimeOut a || isBottomTimeOut b then
     bottom
    else if isFunction a || isFunction b then
     error "/\\! does not handle non-bottom functions."
    else if not (a =^= b) then
     bottom
    else
-    tmapT (/\!!) a b
+    tmapT (/\??) a b
     
-(\/!!) :: (Data a, Data b) => a -> b -> Maybe b
-a \/!! (b :: b) =
-  case (isBottom a, isBottom b) of
+(\/??) :: (?timeOutLimit :: Maybe Int, Data a, Data b) => a -> b -> Maybe b
+a \/?? (b :: b) =
+  case (isBottomTimeOut a, isBottomTimeOut b) of
     (True,  True)  -> Just bottom
     (True,  False) -> Just b
     (False, True)  -> cast a
@@ -144,7 +207,7 @@ a \/!! (b :: b) =
       | isFunction a || isFunction b ->
           error "\\/! does not handle non-bottom functions."
       | not (a =^= b)                -> Nothing
-      | otherwise                    -> tmapM (\/!!) a b
+      | otherwise                    -> tmapM (\/??) a b
 
 ------------------------------------------------------------------------
 
