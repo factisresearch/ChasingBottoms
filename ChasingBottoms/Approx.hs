@@ -32,11 +32,11 @@ Instances are provided for all members of the 'Data' type class. Due
 to the limitations of the Data.Generics approach to generic
 programming, which is not really aimed at this kind of application,
 the implementation is only guaranteed to perform correctly, with
-respect to the paper (and modulo any bugs), on polynomial
-datatypes. In particular, nested and mutually recursive types are not
-handled correctly with respect to the paper. The specification below
-is correct, though (if we assume that the 'Data' instances are
-well-behaved).
+respect to the paper (and modulo any bugs), on non-mutually-recursive
+sum-of-products datatypes. In particular, nested and mutually
+recursive types are not handled correctly with respect to the
+paper. The specification below is correct, though (if we assume that
+the 'Data' instances are well-behaved).
 
 In practice the 'approxAll' function can probably be more useful than
 'approx'. It traverses down /all/ subterms, and it should be possible
