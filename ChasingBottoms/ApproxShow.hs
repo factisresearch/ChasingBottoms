@@ -6,7 +6,6 @@
 module ChasingBottoms.ApproxShow
   ( Prec
   , ApproxShow(..)
-  , module ChasingBottoms.Nat
   ) where
 
 import Data.Generics

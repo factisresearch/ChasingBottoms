@@ -19,7 +19,8 @@ timeOut :: Int -> IO a -> IO (Maybe a)
 timeOut = timeOutMicro . (* 10^6)
 
 -- | 'timeOutMicro' takes a delay in microseconds. Note that the
--- resolution is not too great.
+-- resolution is not necessarily very high (the last time I checked it
+-- was 0.02 seconds).
 timeOutMicro :: Int -> IO a -> IO (Maybe a)
 timeOutMicro delay io = do
   id <- myThreadId

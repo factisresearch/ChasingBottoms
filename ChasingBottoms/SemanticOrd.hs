@@ -12,7 +12,6 @@
 module ChasingBottoms.SemanticOrd
   ( SemanticEq(..)
   , SemanticOrd(..)
-  , module ChasingBottoms.IsBottom
   ) where
 
 import Data.Generics

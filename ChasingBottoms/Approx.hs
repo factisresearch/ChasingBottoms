@@ -2,7 +2,6 @@
 
 module ChasingBottoms.Approx
   ( Approx(..)
-  , module ChasingBottoms.Nat
   ) where
 
 import ChasingBottoms.Nat
@@ -176,12 +175,13 @@ data M2 a = M21 (M1 a) | M22 a deriving (Typeable, Data)
   in  :: F (mu F) a -> (mu F) a
   out :: (mu F) a -> F (mu F) a
 
- F is a functor : C^C x C^C -> (C x C)^C.
+ F is a functor : (C x C)^C -> (C x C)^C.
  (Here C is the base category consisting of monomorphic "Haskell"
  types and functions.)
 
- Hence given an arrow (natural transformation) : (G, H) -> (G', H')
- (G, G', H and H' objects (functors) in C^C) F yields an arrow
+ Hence given an arrow (natural transformation)
+  : forall a . G a -> (H a, K a)
+ (G, H and K objects (functors) in C^C) F yields an arrow
  (natural transformation) : F (G, H) -> F (G', H').
 
  What is an arrow in C^C x C^C? It is a pair of arrows, both in C^C,
