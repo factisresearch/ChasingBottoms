@@ -1,4 +1,6 @@
-module NAD.LockFile where
+module NAD.LockFile
+  ( lockFile
+  ) where
 
 import System.IO
 import System.Posix.IO
