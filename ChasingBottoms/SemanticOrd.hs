@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -fallow-overlapping-instances #-}
+{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
 
 -- | Generic semantic equality and order. The semantic order referred
 -- to is that of a typical CPO for Haskell types, where e.g. @('True',
@@ -22,9 +22,6 @@ import Data.Generics
 import ChasingBottoms.IsBottom
 import ChasingBottoms.IsType
 import qualified Maybe
-
-import Debug.QuickCheck
-import ChasingBottoms.QuickCheckWrapper
 
 infix 4 <!, <=!, ==!, >=!, >!, /=!
 
@@ -117,13 +114,6 @@ childrenOK op = tmapQl (&&) True op
 
 ------------------------------------------------------------------------
 
--- Variant of cast.
-
-cast' :: (Typeable a, Typeable b) => a -> b
-cast' = Maybe.fromJust . cast
-
-------------------------------------------------------------------------
-
 (/\!!) :: (Data a, Data b) => a -> b -> b
 a /\!! (b :: b) =
   if isBottom a || isBottom b then
@@ -149,15 +139,22 @@ a \/!! (b :: b) =
 
 ------------------------------------------------------------------------
 
+-- Variant of cast.
+
+-- cast' :: (Typeable a, Typeable b) => a -> b
+-- cast' = Maybe.fromJust . cast
+
+------------------------------------------------------------------------
+
 -- TODO: Implement a comparison operator which also works for functions.
 
 -- newtype EqFun = EqFun { unEqFun ::
 --   forall a b . (Data a, Data b) => a -> b -> Bool }
 
-class SemanticFunEq a where
-  (!==!), (!/=!) :: a -> a -> Bool
+-- class SemanticFunEq a where
+--   (!==!), (!/=!) :: a -> a -> Bool
 
-  (!/=!) = \x y -> not (x !==! y)
+--   (!/=!) = \x y -> not (x !==! y)
 
 -- instance Data a => SemanticFunEq a where
 --  x !==! y =
@@ -177,18 +174,18 @@ class SemanticFunEq a where
 -- This one works, but it only handles functions on the top level, not
 -- functions inside e.g. lists.
 
-instance (Show a, Arbitrary a, SemanticFunEq b) => SemanticFunEq (a -> b) where
-  f !==! g = case (isBottom f, isBottom g) of
-    (True, True)   -> True
-    (False, False) -> testIt (forAll arbitrary $ \x -> f x !==! g x)
-    _              -> False
+-- instance (Show a, Arbitrary a, SemanticFunEq b) => SemanticFunEq (a -> b) where
+--   f !==! g = case (isBottom f, isBottom g) of
+--     (True, True)   -> True
+--     (False, False) -> testIt (forAll arbitrary $ \x -> f x !==! g x)
+--     _              -> False
 
-instance SemanticEq a => SemanticFunEq a where
-  a !==! b = case (isBottom a, isBottom b) of
-    (True, True)   -> True
-    (False, False) -> -- We know that we are not dealing with functions.
-                      a ==! b
-    _              -> False
+-- instance SemanticEq a => SemanticFunEq a where
+--   a !==! b = case (isBottom a, isBottom b) of
+--     (True, True)   -> True
+--     (False, False) -> -- We know that we are not dealing with functions.
+--                       a ==! b
+--     _              -> False
 
 ------------------------------------------------------------------------
 -- Tests
