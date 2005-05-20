@@ -1,7 +1,7 @@
 {-# OPTIONS -fglasgow-exts #-}
 
 -- | Tests of everything related to "ChasingBottoms". Not finished
---   yet. (Missing: "SemanticOrd", "Nat", "IsType".)
+--   yet. (Missing: "SemanticOrd", "Nat".)
 --
 -- Note that the warnings given when compiling this module are
 -- intentional. See the internal comments for more information.
@@ -14,6 +14,7 @@ import ChasingBottoms.IsBottom
 import ChasingBottoms.TimeOut as T
 import ChasingBottoms.SemanticOrd
 import ChasingBottoms.Nat
+import ChasingBottoms.IsType
 import Data.Generics
 import System.IO.Unsafe
 import Data.Array
@@ -354,6 +355,30 @@ approxShowTests = and
   , tst 2 (bottom ::: bottom ::: 'b' ::: 'c') "(_ ::: _) ::: 'c'"
   ]
 
+
+------------------------------------------------------------------------
+-- Tests of the functions in "ChasingBottoms.IsType".
+
+isTypeTests =
+    -- isFunction identifies functions.
+  [ isFunction (id :: Char -> Char)  ==  True
+  , isFunction ((==) :: Char -> Char -> Bool)  ==  True
+  , isFunction 'c'  ==  False
+  , isFunction [not]  ==  False
+
+  , isTuple [not]  ==  False
+  , isTuple ()  ==  False
+  , isTuple ('a', 'c')  ==  True
+
+  , isList ""  ==  True
+  , isList [not]  ==  True
+  , isList ('a', 'c')  ==  False
+
+  , isString ""  ==  True
+  , isString [not]  ==  False
+  , isString ('a', 'c')  ==  False
+  ]
+
 ------------------------------------------------------------------------
 -- All the tests
 
@@ -365,4 +390,5 @@ tests = do
   print approxTestsOK
   print isBottomTests
   print approxShowTests
+  print $ and isTypeTests
   timeOutTests >>= print
