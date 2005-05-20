@@ -3,3 +3,4 @@
 ^chasing-bottoms\.tar\.gz$
 \.hi$
 \.o$
+(^|/)#.*#$
