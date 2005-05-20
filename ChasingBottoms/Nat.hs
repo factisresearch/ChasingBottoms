@@ -40,12 +40,15 @@ fromSucc :: Nat -> Maybe Nat
 fromSucc (Nat 0) = Nothing
 fromSucc n       = Just $ pred n
 
--- 'natrec' performs primitive recursion on natural numbers.
+-- | 'natrec' performs primitive recursion on natural numbers.
 natrec :: a -> (Nat -> a -> a) -> Nat -> a
 natrec g _ (Nat 0) = g
 natrec g h n       = let p = pred n in h p (natrec g h p)
 
--- 'foldN' is a fold on natural numbers.
+-- | 'foldN' is a fold on natural numbers:
+-- @
+--  foldN g h = natrec g (curry $ h . snd)
+-- @
 foldN :: a -> (a -> a) -> Nat -> a
 foldN g h = natrec g (curry $ h . snd)
 
