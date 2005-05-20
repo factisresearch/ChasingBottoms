@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
+{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
 
 -- |
 -- Module      :  ChasingBottoms.ApproxShow
@@ -122,12 +122,30 @@ minPrec        = 0
 -- Some infix constructors seem to have parentheses around them in
 -- their conString representations. Maybe something should be done about
 -- that. See the Q test case below, and compare with ordinary lists.
-showCon a      = showString $ conString $ toConstr a
+showCon a      = showString $ showConstr' a
 isAtom a       = glength a == 0
-isPrimitive a  = maxConIndex (dataTypeOf a) == 0 
+isPrimitive a  = not $ isAlgType (dataTypeOf a)
 isInfix a      = if isPrimitive a then
                    False
                   else
-                   conFixity (toConstr a) == Infix
+                   constrFixity (toConstr a) == Infix
 wrap s         = \s' -> s . s' . s
 when' b s      = if b then (s .) else (id .)
+
+------------------------------------------------------------------------
+-- Compatibility functions
+
+#if __GLASGOW_HASKELL__ <= 602
+
+showConstr' a = conString $ toConstr a
+isAlgType d = maxConIndex d > 0
+constrFixity = conFixity
+
+#else
+
+showConstr' a
+  | dataTypeRep (dataTypeOf a) == dataTypeRep (dataTypeOf 'c') = 
+      "'" ++ showConstr (toConstr a) ++ "'"
+  | otherwise = showConstr $ toConstr a
+
+#endif

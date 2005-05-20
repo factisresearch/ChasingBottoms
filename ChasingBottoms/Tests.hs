@@ -62,11 +62,11 @@ out_PT x = case x of
   PL t  -> Left t
   PB tt -> Right tt
 
--- Type annotations added just for clarity.
-map_PT :: (forall t . g t -> g' t) -> F g t -> F g' t
-map_PT (f :: forall t . g t -> g' t) (x :: F g t) = case x of
-  Left t   -> Left t
-  Right tt -> Right ((f :: g (t, t) -> g' (t, t)) tt)
+-- Pattern type signature added just for clarity.
+map_PT :: (forall t . g t -> g' t) -> F g t' -> F g' t'
+map_PT f x = case x of
+  Left t                 -> Left t
+  Right (tt :: g (t, t)) -> Right (f tt)
 
 -- Note that we get a boring map using this kind of functor for nested
 -- types:

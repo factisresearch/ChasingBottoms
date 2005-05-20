@@ -1,3 +1,5 @@
+{-# OPTIONS -cpp #-}
+
 -- |
 -- Module      :  ChasingBottoms.IsType
 -- Copyright   :  (c) Nils Anders Danielsson 2004
@@ -19,7 +21,7 @@ isFunction :: Typeable a => a -> Bool
 isFunction f = con f == con not  -- TyCon is abstract.
 
 con :: Typeable a => a -> TyCon
-con = typerepTyCon . typeOf
+con = typeRepTyCon . typeOf
 
 -- | This function is rather fragile, but should be OK. It is only
 -- used by "ChasingBottoms.ApproxShow", which should only be used for
@@ -27,10 +29,21 @@ con = typerepTyCon . typeOf
 -- tuple.
 isTuple :: Typeable a => a -> Bool
 isTuple x = if null s then False else head s == ','
-  where s = tyconString (con x)
+  where s = tyConString (con x)
 
 isString :: Typeable a => a -> Bool
-isString x = isList x && typerepArgs (typeOf x) == typerepArgs (typeOf "")
+isString x = isList x && typeRepArgs (typeOf x) == typeRepArgs (typeOf "")
 
 isList :: Typeable a => a -> Bool
 isList x = con x == con ""
+
+------------------------------------------------------------------------
+-- Compatibility functions
+
+#if __GLASGOW_HASKELL__ <= 602
+
+typeRepTyCon = typerepTyCon
+tyConString = tyconString
+typeRepArgs = typerepArgs
+
+#endif

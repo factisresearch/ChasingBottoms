@@ -1,3 +1,5 @@
+{-# OPTIONS -cpp #-}
+
 -- |
 -- Module      :  ChasingBottoms.Nat
 -- Copyright   :  (c) Nils Anders Danielsson 2004
@@ -15,7 +17,11 @@ module ChasingBottoms.Nat(Nat, isSucc, fromSucc, natrec, foldN) where
 
 -- TODO: Proper tests.
 
+#if __GLASGOW_HASKELL__ <= 602
 import Debug.QuickCheck
+#else
+import Test.QuickCheck
+#endif
 import Ratio ((%))
 
 default (Integer)

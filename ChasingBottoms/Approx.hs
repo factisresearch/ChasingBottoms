@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
+{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
 
 -- |
 -- Module      :  ChasingBottoms.Approx
@@ -102,6 +102,8 @@ approxGen' n
                            childTerm
      in gmapT fun x
 
+#if __GLASGOW_HASKELL__ <= 602
+
 instance Eq DataType where
   d1 == d2 = dataTypeCons d1 =|= dataTypeCons d2
 
@@ -114,3 +116,10 @@ xs =|= ys = case xs of
              xs' =|= List.delete x ys
             else
              False
+
+#else
+
+instance Eq DataType where
+  d1 == d2 = dataTypeRep d1 == dataTypeRep d2
+
+#endif

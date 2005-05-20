@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
+{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
 
 -- |
 -- Module      :  ChasingBottoms.SemanticOrd
@@ -117,7 +117,7 @@ class SemanticEq a => SemanticOrd a where
 
   semanticCompare' x y | x <?  y   = Just LT
                        | x ==? y   = Just EQ
-                       | x >?  y   = Just GT
+                       | x >?  y   = Just Prelude.GT
                        | otherwise = Nothing
 
   x <=? y = case semanticCompare' x y of
@@ -182,7 +182,8 @@ a =^= b = toConstr a == toConstr b
 
 -- Check children.
 childrenOK :: Rel -> Rel
-childrenOK op = tmapQl (&&) True op
+childrenOK op = foldr (&&) True .|.. gzipWithQ op
+  where f .|.. g = \x y -> f (g x y)
 
 ------------------------------------------------------------------------
 
@@ -195,7 +196,7 @@ a /\?? (b :: b) =
    else if not (a =^= b) then
     bottom
    else
-    tmapT (/\??) a b
+    gzipWithT (/\??) a b
     
 (\/??) :: (?timeOutLimit :: Maybe Int, Data a, Data b) => a -> b -> Maybe b
 a \/?? (b :: b) =
@@ -207,7 +208,7 @@ a \/?? (b :: b) =
       | isFunction a || isFunction b ->
           error "\\/! does not handle non-bottom functions."
       | not (a =^= b)                -> Nothing
-      | otherwise                    -> tmapM (\/??) a b
+      | otherwise                    -> gzipWithM (\/??) a b
 
 ------------------------------------------------------------------------
 
@@ -258,6 +259,20 @@ a \/?? (b :: b) =
 --     (False, False) -> -- We know that we are not dealing with functions.
 --                       a ==! b
 --     _              -> False
+
+------------------------------------------------------------------------
+-- Compatibility functions
+
+#if __GLASGOW_HASKELL__ <= 602
+
+gzipWithT :: GenericQ GenericT -> GenericQ GenericT
+gzipWithT = tmapT
+gzipWithM :: Monad m => GenericQ (GenericM m) -> GenericQ (GenericM m)
+gzipWithM = tmapM
+gzipWithQ :: GenericQ (GenericQ r) -> GenericQ (GenericQ [r])
+gzipWithQ q = tmapQl (++) [] (\x y -> [q x y])
+
+#endif
 
 ------------------------------------------------------------------------
 -- Tests
