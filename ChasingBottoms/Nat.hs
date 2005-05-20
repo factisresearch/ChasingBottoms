@@ -99,4 +99,4 @@ instance Arbitrary Nat where
   arbitrary = do
     n <- arbitrary :: Gen Integer
     return $ fromInteger $ abs n
-  coarbitrary n = variant (fromEnum n `mod` 2) . coarbitrary (n `div` 2)
+  coarbitrary n = coarbitrary (toInteger n)
