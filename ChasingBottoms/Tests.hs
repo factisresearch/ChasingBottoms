@@ -262,7 +262,7 @@ infiniteRecursion = leftInfinite' == leftInfinite'
 
 data A2 = A2 { aaa :: A2 } | C { ccc :: A2 }
 
-isBottomTests = and
+isBottomTests =
     -- Basic cases.
   [ isBottom bottom  ==  True
   , isBottom undefined  ==  True
@@ -328,7 +328,7 @@ pr n x template = do
 
 tst n x template = approxShow n x == template
 
-approxShowTests = and
+approxShowTests =
   [ tst 4 left "B (B (B (B _ _) L) L) L"
   , tst 4 (bottom :: Bool) "_|_"
   , tst 4 not "<function /= _|_>"
@@ -388,7 +388,7 @@ isTypeTests =
 tests :: IO ()
 tests = do
   print approxTestsOK
-  print isBottomTests
-  print approxShowTests
+  print $ and isBottomTests
+  print $ and approxShowTests
   print $ and isTypeTests
   timeOutTests >>= print
