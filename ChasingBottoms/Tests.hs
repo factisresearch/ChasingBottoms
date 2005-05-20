@@ -1,13 +1,19 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# OPTIONS -fglasgow-exts -cpp #-}
 
 -- | Tests of everything related to "ChasingBottoms". Not finished
---   yet. (Missing: "SemanticOrd", "Nat".)
+--   yet. (Missing: "SemanticOrd".)
 --
 -- Note that the warnings given when compiling this module are
 -- intentional. See the internal comments for more information.
 
 module ChasingBottoms.Tests(tests) where
 
+#if __GLASGOW_HASKELL__ <= 602
+import Debug.QuickCheck
+#else
+import Test.QuickCheck
+#endif
+import Text.Show.Functions
 import ChasingBottoms.Approx
 import ChasingBottoms.ApproxShow
 import ChasingBottoms.IsBottom
@@ -19,6 +25,8 @@ import Data.Generics
 import System.IO.Unsafe
 import Data.Array
 import System.Exit
+import Data.List
+import Data.Ratio
 import qualified Control.Exception as E
 
 ------------------------------------------------------------------------
@@ -380,6 +388,151 @@ isTypeTests =
   ]
 
 ------------------------------------------------------------------------
+-- Tests of the functions in "ChasingBottoms.Nat".
+
+-- Testing isSucc.
+
+prop_isSucc n = isSucc n == (n > 0)
+
+-- Testing fromSucc.
+
+prop_fromSucc n | n == 0    = fromSucc n == Nothing
+                | otherwise = fromSucc n == Just (n-1)
+
+-- Testing natrec.
+
+-- How do you test something as versatile as natrec? Well, at least we
+-- can verify that we can use it to implement addition.
+
+prop_natrec_add m n = natrec m (\_ o -> succ o) n == m + n
+
+-- There is no need to test foldN, since it is specified by its
+-- definition.
+
+-- Testing Enum.
+
+prop_Nat_Enum_succ (n :: Nat) = succ n == n + 1
+prop_Nat_Enum_pred (n :: Nat) = n > 0 ==> pred n == n - 1
+
+-- Testing Eq.
+
+prop_Nat_Eq_refl (m :: Nat) = m == m
+prop_Nat_Eq_sym (m :: Nat) n =
+  -- collect (m, n) $  -- OK distribution.
+    m == n ==> n == m
+prop_Nat_Eq_trans (i :: Nat) j k =
+  -- collect (i, j, k) $  -- Distribution good enough.
+    i == j && j == k ==> i == k
+prop_Nat_Eq_cong (f :: Nat -> Nat) m n =
+  -- collect (m, n) $  -- OK distribution.
+    m == n ==> f m == f n
+
+prop_Nat_Eq_noteq (m :: Nat) n = (m == n) == not (m /= n)
+
+-- Testing Show.
+
+prop_Nat_Show (m :: Nat) = show m == show (toInteger m)
+
+-- Testing Ord.
+
+prop_Nat_Ord_refl (m :: Nat) = m <= m
+prop_Nat_Ord_antisym (m :: Nat) n =
+  -- collect (m, n) $  -- OK distribution.
+    m <= n && n <= m ==> m == n
+prop_Nat_Ord_trans (i :: Nat) j k =
+  -- collect (i, j, k) $  -- OK distribution.
+    i <= j && j <= k ==> i <= k
+
+-- Testing Num.
+
+prop_Nat_mul_iterated_sum (m :: Nat) n =
+  m * n == foldr (+) 0 (genericReplicate m n)
+
+prop_Nat_plus_assoc (m :: Nat) n o = m + (n + o) == (m + n) + o
+prop_Nat_plus_comm (m :: Nat) n    = m + n == n + m
+
+prop_Nat_mul_assoc (m :: Nat) n o = m * (n * o) == (m * n) * o
+prop_Nat_mul_comm (m :: Nat) n    = m * n == n * m
+
+prop_Nat_mul_plus_left_dist (m :: Nat) n o = m * (n + o) == m * n + m * o
+
+prop_Nat_mul_plus_zero (m :: Nat) = m + 0 == m
+prop_Nat_mul_mul_unit (m :: Nat)  = m * 1 == m
+
+prop_Nat_minus (m :: Nat) n =
+  -- collect (m, n) $  -- OK distribution.
+  m >= n ==> (m - n) + n == m
+
+prop_Nat_signum_abs (m :: Nat) = signum m * abs m == m
+prop_Nat_signum_zero           = signum 0 == 0
+
+prop_Nat_fromInteger_plus m n =
+  m >= 0 && n >= 0 ==>
+    fromInteger m + fromInteger n == (fromInteger (m + n) :: Nat)
+prop_Nat_fromInteger_mul m n =
+  m >= 0 && n >= 0 ==>
+    fromInteger m * fromInteger n == (fromInteger (m * n) :: Nat)
+
+-- negate is undefined.
+
+-- Testing Integral.
+
+prop_Nat_to_from (m :: Nat) = fromInteger (toInteger m) == m
+prop_Nat_from_to i = i >= 0 ==> toInteger (fromInteger i :: Nat) == i
+
+prop_Nat_quotRem (m :: Nat) n =
+  n /= 0 ==> m `quotRem` n == (m `quot` n, m `rem` n)
+prop_Nat_divMod (m :: Nat) n =
+  n /= 0 ==> m `divMod` n == (m `div` n, m `mod` n)
+
+prop_Nat_quot_rem (m :: Nat) n =
+  n /= 0 ==> (m `quot` n) * n + m `rem` n == m
+prop_Nat_div_mod (m :: Nat) n =
+  n /= 0 ==> (m `div` n) * n + m `mod` n == m
+
+-- Testing Real.
+
+prop_Nat_toRational (m :: Nat) = toRational m == toInteger m % 1
+
+-- All tests collected together.
+
+natTests = do
+  test prop_isSucc
+  test prop_fromSucc
+  test prop_natrec_add
+  test prop_Nat_Enum_succ
+  test prop_Nat_Enum_pred
+  test prop_Nat_Eq_refl
+  test prop_Nat_Eq_sym
+  test prop_Nat_Eq_trans
+  test prop_Nat_Eq_cong
+  test prop_Nat_Eq_noteq
+  test prop_Nat_Show
+  test prop_Nat_Ord_refl
+  test prop_Nat_Ord_antisym
+  test prop_Nat_Ord_trans
+  test prop_Nat_mul_iterated_sum
+  test prop_Nat_plus_assoc
+  test prop_Nat_plus_comm
+  test prop_Nat_mul_assoc
+  test prop_Nat_mul_comm
+  test prop_Nat_mul_plus_left_dist
+  test prop_Nat_mul_plus_zero
+  test prop_Nat_mul_mul_unit
+  test prop_Nat_minus
+  test prop_Nat_signum_abs
+  test prop_Nat_signum_zero
+  test prop_Nat_fromInteger_plus
+  test prop_Nat_fromInteger_mul
+  test prop_Nat_to_from
+  test prop_Nat_from_to
+  test prop_Nat_quotRem
+  test prop_Nat_divMod
+  test prop_Nat_quot_rem
+  test prop_Nat_div_mod
+  test prop_Nat_toRational
+
+------------------------------------------------------------------------
 -- All the tests
 
 -- | This function runs all the tests. The tests have succeeded if it
@@ -387,6 +540,7 @@ isTypeTests =
 
 tests :: IO ()
 tests = do
+  natTests
   print approxTestsOK
   print $ and isBottomTests
   print $ and approxShowTests

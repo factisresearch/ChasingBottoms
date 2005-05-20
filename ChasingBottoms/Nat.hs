@@ -15,8 +15,6 @@
 
 module ChasingBottoms.Nat(Nat, isSucc, fromSucc, natrec, foldN) where
 
--- TODO: Proper tests.
-
 #if __GLASGOW_HASKELL__ <= 602
 import Debug.QuickCheck
 #else
