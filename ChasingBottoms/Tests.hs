@@ -115,7 +115,7 @@ type M a = (G a, H a)
 -- work either...
 type ProdArr a1 a2 b1 b2 = (a1 -> b1, a2 -> b2)
 
--- in_GH :: GH a (M a) :--> M a 
+-- in_GH :: GH a (M a) :--> M a
 in_GH :: ProdArr (Either a (H a)) (Either (G a) a) (G a) (H a)
 in_GH = (in_G, in_H)
   where
