@@ -2,7 +2,7 @@
 
 -- |
 -- Module      :  ChasingBottoms.IsBottom
--- Copyright   :  (c) Nils Anders Danielsson 2004
+-- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
 -- License     :  See the file LICENSE.
 -- 
 -- Maintainer  :  http://www.cs.chalmers.se/~nad/
