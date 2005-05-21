@@ -20,7 +20,7 @@ import Debug.QuickCheck
 #else
 import Test.QuickCheck
 #endif
-import Ratio ((%))
+import Data.Ratio ((%))
 
 default (Integer)
 

@@ -42,7 +42,7 @@ module Test.ChasingBottoms.SemanticOrd
 import Data.Generics
 import Test.ChasingBottoms.IsBottom
 import Test.ChasingBottoms.IsType
-import qualified Maybe
+import qualified Data.Maybe as Maybe
 import Test.ChasingBottoms.Nat
 import Test.ChasingBottoms.Approx
 

@@ -16,7 +16,7 @@ module Test.ChasingBottoms.Approx
 
 import Test.ChasingBottoms.Nat
 import Data.Generics
-import qualified List
+import qualified Data.List as List
 
 {-|
 'Approx' is a class for approximation functions as described

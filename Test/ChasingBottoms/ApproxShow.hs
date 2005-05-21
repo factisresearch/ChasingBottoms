@@ -21,7 +21,7 @@ import Data.Generics
 import Test.ChasingBottoms.IsBottom
 import Test.ChasingBottoms.Nat
 import Test.ChasingBottoms.IsType
-import qualified List
+import qualified Data.List as List
 
 -- | Precedence level.
 type Prec = Int
