@@ -1,7 +1,7 @@
 {-# OPTIONS -fglasgow-exts #-}
 
 -- |
--- Module      :  ChasingBottoms.TimeOut
+-- Module      :  Test.ChasingBottoms.TimeOut
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
 -- License     :  See the file LICENSE.
 -- 
@@ -17,7 +17,7 @@
 -- has reached weak head normal form (i.e. something distinct from
 -- bottom).
 
-module ChasingBottoms.TimeOut
+module Test.ChasingBottoms.TimeOut
   ( Result(..)
   , timeOut
   , timeOut'
@@ -41,7 +41,7 @@ data Result a
 --   * If the computation terminates before that, then
 --     @'Value' v@ is returned, where @v@ is the resulting value. Note
 --     that this value may be equal to bottom, e.g. if @c = 'return'
---     'ChasingBottoms.IsBottom.bottom'@.
+--     'Test.ChasingBottoms.IsBottom.bottom'@.
 --
 --   * If the computation does not terminate, then 'NonTermination' is
 --     returned.

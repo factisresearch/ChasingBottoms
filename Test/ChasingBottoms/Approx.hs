@@ -1,7 +1,7 @@
 {-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
 
 -- |
--- Module      :  ChasingBottoms.Approx
+-- Module      :  Test.ChasingBottoms.Approx
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
 -- License     :  See the file LICENSE.
 -- 
@@ -10,11 +10,11 @@
 -- Portability :  non-portable (GHC-specific)
 --
 
-module ChasingBottoms.Approx
+module Test.ChasingBottoms.Approx
   ( Approx(..)
   ) where
 
-import ChasingBottoms.Nat
+import Test.ChasingBottoms.Nat
 import Data.Generics
 import qualified List
 

@@ -1,7 +1,7 @@
 {-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
 
 -- |
--- Module      :  ChasingBottoms.ApproxShow
+-- Module      :  Test.ChasingBottoms.ApproxShow
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
 -- License     :  See the file LICENSE.
 -- 
@@ -12,15 +12,15 @@
 -- Functions for converting arbitrary (non-function, partial,
 -- possibly infinite) values into strings.
 
-module ChasingBottoms.ApproxShow
+module Test.ChasingBottoms.ApproxShow
   ( Prec
   , ApproxShow(..)
   ) where
 
 import Data.Generics
-import ChasingBottoms.IsBottom
-import ChasingBottoms.Nat
-import ChasingBottoms.IsType
+import Test.ChasingBottoms.IsBottom
+import Test.ChasingBottoms.Nat
+import Test.ChasingBottoms.IsType
 import qualified List
 
 -- | Precedence level.

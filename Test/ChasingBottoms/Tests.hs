@@ -1,12 +1,12 @@
 {-# OPTIONS -fglasgow-exts -cpp #-}
 
--- | Tests of everything related to "ChasingBottoms". Not finished
+-- | Tests of everything related to "Test.ChasingBottoms". Not finished
 --   yet. (Missing: "SemanticOrd".)
 --
 -- Note that the warnings given when compiling this module are
 -- intentional. See the internal comments for more information.
 
-module ChasingBottoms.Tests(tests) where
+module Test.ChasingBottoms.Tests(tests) where
 
 #if __GLASGOW_HASKELL__ <= 602
 import Debug.QuickCheck
@@ -14,13 +14,13 @@ import Debug.QuickCheck
 import Test.QuickCheck
 #endif
 import Text.Show.Functions
-import ChasingBottoms.Approx
-import ChasingBottoms.ApproxShow
-import ChasingBottoms.IsBottom
-import ChasingBottoms.TimeOut as T
-import ChasingBottoms.SemanticOrd
-import ChasingBottoms.Nat
-import ChasingBottoms.IsType
+import Test.ChasingBottoms.Approx
+import Test.ChasingBottoms.ApproxShow
+import Test.ChasingBottoms.IsBottom
+import Test.ChasingBottoms.TimeOut as T
+import Test.ChasingBottoms.SemanticOrd
+import Test.ChasingBottoms.Nat
+import Test.ChasingBottoms.IsType
 import Data.Generics
 import System.IO.Unsafe
 import Data.Array
@@ -30,7 +30,7 @@ import Data.Ratio
 import qualified Control.Exception as E
 
 ------------------------------------------------------------------------
--- Tests of the functions in "ChasingBottoms.Approx"
+-- Tests of the functions in "Test.ChasingBottoms.Approx"
 
 -- Improve the testing here. (Use QuickCheck when there is some proper
 -- infrastructure for testing bottoms and infinite stuff. Hmm... This
@@ -226,7 +226,7 @@ approxTestsOK = and approxTests
 --   $(if not approxTestsOK then fail "Tests failed." else return [])
 
 ------------------------------------------------------------------------
--- Tests of the functions in "ChasingBottoms.TimeOut".
+-- Tests of the functions in "Test.ChasingBottoms.TimeOut".
 
 -- The "Micro" variants are not tested directly, but they are used
 -- internally by the functions below.
@@ -252,7 +252,7 @@ timeOutTests = do
 
 
 ------------------------------------------------------------------------
--- Tests of the functions in "ChasingBottoms.IsBottom".
+-- Tests of the functions in "Test.ChasingBottoms.IsBottom".
 
 isException f = unsafePerformIO $
   (E.evaluate f >> return False) `E.catch` const (return True)
@@ -319,7 +319,7 @@ isBottomTests =
   ]
 
 ------------------------------------------------------------------------
--- Tests of the functions in "ChasingBottoms.ApproxShow".
+-- Tests of the functions in "Test.ChasingBottoms.ApproxShow".
 
 data T = L | B T T deriving (Typeable, Data)
 
@@ -365,7 +365,7 @@ approxShowTests =
 
 
 ------------------------------------------------------------------------
--- Tests of the functions in "ChasingBottoms.IsType".
+-- Tests of the functions in "Test.ChasingBottoms.IsType".
 
 isTypeTests =
     -- isFunction identifies functions.
@@ -388,7 +388,7 @@ isTypeTests =
   ]
 
 ------------------------------------------------------------------------
--- Tests of the functions in "ChasingBottoms.Nat".
+-- Tests of the functions in "Test.ChasingBottoms.Nat".
 
 -- Testing isSucc.
 

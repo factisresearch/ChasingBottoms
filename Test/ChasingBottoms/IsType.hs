@@ -1,7 +1,7 @@
 {-# OPTIONS -cpp #-}
 
 -- |
--- Module      :  ChasingBottoms.IsType
+-- Module      :  Test.ChasingBottoms.IsType
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
 -- License     :  See the file LICENSE.
 -- 
@@ -11,7 +11,12 @@
 --
 -- Internal helper functions.
 
-module ChasingBottoms.IsType( isFunction, isTuple, isList, isString ) where
+module Test.ChasingBottoms.IsType
+  ( isFunction
+  , isTuple
+  , isList
+  , isString
+  ) where
 
 import Data.Typeable
 
@@ -24,9 +29,9 @@ con :: Typeable a => a -> TyCon
 con = typeRepTyCon . typeOf
 
 -- | This function is rather fragile, but should be OK. It is only
--- used by "ChasingBottoms.ApproxShow", which should only be used for
--- debugging purposes anyway. The unit type is not considered to be a
--- tuple.
+-- used by "Test.ChasingBottoms.ApproxShow", which should only be used
+-- for debugging purposes anyway. The unit type is not considered to
+-- be a tuple.
 isTuple :: Typeable a => a -> Bool
 isTuple x = if null s then False else head s == ','
   where s = tyConString (con x)

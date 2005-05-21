@@ -1,7 +1,7 @@
 {-# OPTIONS -cpp #-}
 
 -- |
--- Module      :  ChasingBottoms.Nat
+-- Module      :  Test.ChasingBottoms.Nat
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
 -- License     :  See the file LICENSE.
 -- 
@@ -13,7 +13,7 @@
 -- Note that since 'Integer's are used there is no infinite natural
 -- number; in other words, 'succ' is strict.
 
-module ChasingBottoms.Nat(Nat, isSucc, fromSucc, natrec, foldN) where
+module Test.ChasingBottoms.Nat(Nat, isSucc, fromSucc, natrec, foldN) where
 
 #if __GLASGOW_HASKELL__ <= 602
 import Debug.QuickCheck

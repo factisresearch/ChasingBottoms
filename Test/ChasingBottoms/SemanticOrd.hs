@@ -1,7 +1,7 @@
 {-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
 
 -- |
--- Module      :  ChasingBottoms.SemanticOrd
+-- Module      :  Test.ChasingBottoms.SemanticOrd
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
 -- License     :  See the file LICENSE.
 -- 
@@ -34,17 +34,17 @@
 -- functions, but I have not managed to tweak the type system so that
 -- it can be done transparently.
 
-module ChasingBottoms.SemanticOrd
+module Test.ChasingBottoms.SemanticOrd
   ( SemanticEq(..)
   , SemanticOrd(..)
   ) where
 
 import Data.Generics
-import ChasingBottoms.IsBottom
-import ChasingBottoms.IsType
+import Test.ChasingBottoms.IsBottom
+import Test.ChasingBottoms.IsType
 import qualified Maybe
-import ChasingBottoms.Nat
-import ChasingBottoms.Approx
+import Test.ChasingBottoms.Nat
+import Test.ChasingBottoms.Approx
 
 infix 4 <!, <=!, ==!, >=!, >!, /=!
 infix 4 <?, <=?, ==?, >=?, >?, /=?

@@ -1,7 +1,7 @@
 {-# OPTIONS -fimplicit-params #-}
 
 -- |
--- Module      :  ChasingBottoms.IsBottom
+-- Module      :  Test.ChasingBottoms.IsBottom
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
 -- License     :  See the file LICENSE.
 -- 
@@ -10,12 +10,12 @@
 -- Portability :  non-portable (exceptions, implicit parameters)
 --
 
-module ChasingBottoms.IsBottom(isBottom, bottom, isBottomTimeOut) where
+module Test.ChasingBottoms.IsBottom(isBottom, bottom, isBottomTimeOut) where
 
 import Prelude hiding (catch)
 import Control.Exception (catch, throw, Exception(..), evaluate)
 import System.IO.Unsafe (unsafePerformIO)
-import qualified ChasingBottoms.TimeOut as T
+import qualified Test.ChasingBottoms.TimeOut as T
 
 -- For testing purposes:
 import System
@@ -63,7 +63,7 @@ bottom = error "_|_"
 -- invocations. Take it for what it is worth.
 --
 -- 'isBottomTimeOut' is subject to all the same scheduling vagaries as
--- 'ChasingBottoms.TimeOut.timeOut'.
+-- 'Test.ChasingBottoms.TimeOut.timeOut'.
 
 isBottomTimeOut :: (?timeOutLimit :: Maybe Int) => a -> Bool
 isBottomTimeOut f = unsafePerformIO $
