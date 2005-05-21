@@ -17,10 +17,6 @@ import Control.Exception (catch, throw, Exception(..), evaluate)
 import System.IO.Unsafe (unsafePerformIO)
 import qualified Test.ChasingBottoms.TimeOut as T
 
--- For testing purposes:
-import System
-import Array
-
 -- | @'isBottom' a@ returns 'False' if @a@ is distinct from bottom. If
 -- @a@ equals bottom and results in an exception which is caught by
 -- 'isBottom', and this exception is of a certain kind (see below),
