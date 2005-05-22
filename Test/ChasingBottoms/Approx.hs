@@ -25,7 +25,7 @@ Gibbons, Information Processing Letters, 79(4):197-201, Elsevier
 Science, August 2001, <http://www.cs.nott.ac.uk/~gmh/bib.html>.
 
 Instances are provided for all members of the 'Data' type class. Due
-to the limitations of the Data.Generics approach to generic
+to the limitations of the "Data.Generics" approach to generic
 programming, which is not really aimed at this kind of application,
 the implementation is only guaranteed to perform correctly, with
 respect to the paper (and modulo any bugs), on non-mutually-recursive

@@ -24,13 +24,14 @@ import qualified Test.ChasingBottoms.TimeOut as T
 -- re-thrown. If @a@ never reaches a weak head normal form and
 -- never throws an exception, then @'isBottom' a@ never terminates.
 --
--- The exceptions that yield 'True' are those that correspond to \"pure
--- bottoms\", i.e. bottoms that can originate in pure code. Assertions
--- are excluded, since their behaviour depends on compiler flags (not
--- pure, and a failed assertion should really yield an exception and
--- nothing else). The same applies to arithmetic exceptions (machine
--- dependent, except possibly for 'DivideByZero', but the value
--- infinity makes that case unclear as well).
+-- The exceptions that yield 'True' are those that correspond to
+-- \"pure bottoms\", i.e. bottoms that can originate in pure code.
+-- Assertions are excluded, since their behaviour depends on compiler
+-- flags (not pure, and a failed assertion should really yield an
+-- exception and nothing else). The same applies to arithmetic
+-- exceptions (machine dependent, except possibly for
+-- 'Control.Exception.DivideByZero', but the value infinity makes that
+-- case unclear as well).
 
 -- Should we use throw or throwIO below?
 --   It doesn't seem to matter, and I don't think it matters, but
@@ -51,8 +52,8 @@ isBottom = let ?timeOutLimit = Nothing in isBottomTimeOut
 bottom :: a
 bottom = error "_|_"
 
--- | 'isBottomTimeOut' works like 'isBottom', but if '?timeOutLimit'
--- is 'Just lim', then computations taking more than 'lim' seconds are
+-- | 'isBottomTimeOut' works like 'isBottom', but if @?timeOutLimit@
+-- is @'Just' lim@, then computations taking more than @lim@ seconds are
 -- also considered to be equal to bottom. Note that this is a very
 -- crude approximation of what a bottom is. Also note that this
 -- \"function\" may return different answers upon different

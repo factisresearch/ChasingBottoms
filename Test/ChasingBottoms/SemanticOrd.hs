@@ -21,11 +21,11 @@
 -- Some functions take the implicit parameters @?approxDepth@ and
 -- @?timeOutLimit@. They have the following meaning:
 --
--- [@'?approxDepth'@] If equal to @'Just' n@, an @'approxAll' n@ is
+-- [@?approxDepth@] If equal to @'Just' n@, an @'approxAll' n@ is
 -- performed on all arguments before doing whatever the function is
 -- supposed to be doing.
 --
--- [@'?timeOutLimit'@] If equal to @'Just' n@, then all computations
+-- [@?timeOutLimit@] If equal to @'Just' n@, then all computations
 -- that take more than @n@ seconds to complete are considered to be
 -- equal to 'bottom'. This functionality is implemented using
 -- 'isBottomTimeOut'.

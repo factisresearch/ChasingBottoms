@@ -44,8 +44,9 @@ natrec g _ (Nat 0) = g
 natrec g h n       = let p = pred n in h p (natrec g h p)
 
 -- | 'foldN' is a fold on natural numbers:
+--
 -- @
---  foldN g h = natrec g (curry $ h . snd)
+--  'foldN' g h = 'natrec' g ('curry' '$' h . 'snd')
 -- @
 foldN :: a -> (a -> a) -> Nat -> a
 foldN g h = natrec g (curry $ h . snd)

@@ -88,13 +88,15 @@ killThread' threadId = E.throwDynTo threadId Die
 -- computations. The definition,
 --
 -- @
---   'timeOut'' n = 'timeOut' n . Control.Exception.evaluate
+--   'timeOut'' n = 'timeOut' n . 'E.evaluate'
 -- @
 --
--- ensures that @'timeOut'' 1 bottom@ usually returns @'Exception'
--- <something>@.  (@'timeOut' 1 (return bottom)@ usually returns
--- @'Value' 'bottom'@; in other words, the computation reaches whnf
--- almost immediately, defeating the purpose of the time-out.)
+-- ensures that @'timeOut'' 1 'Test.ChasingBottoms.IsBottom.bottom'@
+-- usually returns @'Exception' \<something\>@. (@'timeOut' 1 ('return'
+-- 'Test.ChasingBottoms.IsBottom.bottom')@ usually returns @'Value'
+-- 'Test.ChasingBottoms.IsBottom.bottom'@; in other words, the
+-- computation reaches whnf almost immediately, defeating the purpose
+-- of the time-out.)
 
 timeOut' :: Int -> a -> IO (Result a)
 timeOut' n = timeOut n . E.evaluate
@@ -102,7 +104,7 @@ timeOut' n = timeOut n . E.evaluate
 -- | 'timeOutMicro'' is the equivalent variant of 'timeOutMicro':
 --
 -- @
---  'timeOutMicro'' n = 'timeOutMicro' n . Control.Exception.evaluate
+--  'timeOutMicro'' n = 'timeOutMicro' n . 'E.evaluate'
 -- @
 
 timeOutMicro' :: Int -> a -> IO (Result a)
