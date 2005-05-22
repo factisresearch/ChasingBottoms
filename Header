@@ -88,4 +88,4 @@ most of the rest requires @Data.Generics@; @isBottom@ only requires
 exceptions, though. Implicit parameters are also used for some parts
 of the code, but that can be avoided by changing the interface.
 
-Source code: <http://www.cs.chalmers.se/~nad/software/ChasingBottoms/chasing-bottoms.tar.gz>.
+Source code: <http://www.cs.chalmers.se/~nad/software/ChasingBottoms/ChasingBottoms.tar.gz>.
