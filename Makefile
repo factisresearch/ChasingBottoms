@@ -5,13 +5,16 @@
 
 # Path to Haddock.
 HADDOCK ?= haddock
+
 # URL prefix leading to Haddock documentation for the hierarchical
 # libraries.
 GHC_DOC_URL ?= http://www.haskell.org/ghc/docs/latest/html/libraries
+
 # Path prefix leading to Haddock interface files for the hierarchical
 # libraries.
 GHC_DOC_PATH ?= /usr/local/share/ghc-6.4/html/libraries
-# Store documentation in this directory, after removing it.
+
+# Store documentation in this directory, after emptying it.
 DOCDIR = docs
 
 ########################################################################
