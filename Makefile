@@ -3,6 +3,8 @@
 ########################################################################
 # You may need to edit the following variables:
 
+# Path to Haddock.
+HADDOCK ?= haddock
 # URL prefix leading to Haddock documentation for the hierarchical
 # libraries.
 GHC_DOC_URL ?= http://www.haskell.org/ghc/docs/latest/html/libraries
@@ -29,7 +31,7 @@ ChasingBottoms/TimeOut.hs
 $(DOCDIR) : $(addprefix Test/,$(EXPOSED_SOURCES:=.processed)) Header
 	-rm -rf $(DOCDIR)
 	mkdir -p $(DOCDIR)
-	haddock -h --title="Chasing Bottoms" --prologue=Header -odocs \
+	$(HADDOCK) -h --title="Chasing Bottoms" --prologue=Header -odocs \
 	  -i$(GHC_DOC_URL)/base,$(GHC_DOC_PATH)/base/base.haddock \
 	  -i$(GHC_DOC_URL)/QuickCheck,$(GHC_DOC_PATH)/QuickCheck/QuickCheck.haddock \
 	  $(filter Test/%,$^)
