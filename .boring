@@ -1,6 +1,9 @@
 (^|/)_darcs($|/)
 ^docs$
+^dist$
 ^chasing-bottoms\.tar\.gz$
+\..*-config$
 \.hi$
 \.o$
 (^|/)#.*#$
+\.processed$
