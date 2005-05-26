@@ -4,7 +4,7 @@
 # You may need to edit the following variables:
 
 # Path to Haddock.
-HADDOCK ?= haddock
+HADDOCK ?= haddock-0.6
 
 # URL prefix leading to Haddock documentation for the hierarchical
 # libraries.
@@ -12,7 +12,7 @@ GHC_DOC_URL ?= http://www.haskell.org/ghc/docs/latest/html/libraries
 
 # Path prefix leading to Haddock interface files for the hierarchical
 # libraries.
-GHC_DOC_PATH ?= /usr/local/share/ghc-6.4/html/libraries
+GHC_DOC_PATH ?= /usr/ed-pkg/wild/ghc-6.4/share/ghc-6.4/html/libraries
 
 # Store documentation in this directory, after emptying it.
 DOCDIR = docs
