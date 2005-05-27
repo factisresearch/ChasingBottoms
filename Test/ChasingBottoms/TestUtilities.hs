@@ -27,7 +27,7 @@ runQuickCheckTests :: [TestOptions -> IO TestResult]
                       -> IO Bool
 runQuickCheckTests tests = do
   results <- mapM ($ testOptions) tests
-  mapM_ (putStr . show) results
+  mapM_ (putStr . showTR) results
   return $ all ok $ results
   where
   ok (TestOk {})       = True
@@ -41,20 +41,15 @@ runQuickCheckTests tests = do
                             , debug_tests     = False
                             }
 
--- | Show instance for 'TestResult' suitable for 'runQuickCheckTests'.
-
-instance Show TestResult where
-  show (TestOk _ n args) =
+  showTR (TestOk _ n args) =
     "OK, passed " ++ show n ++ " tests.\n" ++ showArgs args
-  show (TestExausted _ n args) =
+  showTR (TestExausted _ n args) =
     "Arguments exhausted after " ++ show n ++ " tests.\n" ++ showArgs args
-  show (TestFailed _ _) = "Test failed.\n"
-  show (TestAborted _) = "Test resulted in exception.\n"
+  showTR (TestFailed _ _) = "Test failed.\n"
+  showTR (TestAborted _) = "Test resulted in exception.\n"
 
--- | Helper function for the 'TestResult' 'Show' instance.
-
-showArgs :: [[String]] -> String
-showArgs args
-  | all null args = ""
-  | otherwise     = unlines . map (indent . concat . intersperse ", ") $ args
-  where indent = ("  " ++)
+  showArgs :: [[String]] -> String
+  showArgs args
+    | all null args = ""
+    | otherwise     = unlines . map (indent . concat . intersperse ", ") $ args
+    where indent = ("  " ++)
