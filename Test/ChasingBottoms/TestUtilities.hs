@@ -121,8 +121,8 @@ prop_congruence element equalTo notEqualTo (===) =
            forAll (pair element equalTo) $ \(x, y) ->
              f x == (f y :: Integer)
 
--- | Test that an 'Eq' instance is a congruence, and that '(/=)' is
--- the negation of '(==)'.
+-- | Test that an 'Eq' instance is a congruence, and that '/=' is
+-- the negation of '=='.
 
 prop_Eq_congruence
   :: (Show a, Arbitrary a, Eq a)
