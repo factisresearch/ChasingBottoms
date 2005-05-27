@@ -273,17 +273,3 @@ gzipWithQ :: GenericQ (GenericQ r) -> GenericQ (GenericQ [r])
 gzipWithQ q = tmapQl (++) [] (\x y -> [q x y])
 
 #endif
-
-------------------------------------------------------------------------
--- Tests
-
-tests =
-  [
-
-    -- We should check that ==! corresponds to an equivalence
-    -- relation, and so on for the other operators, plus test that
-    -- they really do what they are supposed to do.
-
-  ]
-
-testsOK = and tests

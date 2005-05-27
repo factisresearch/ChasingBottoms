@@ -20,6 +20,7 @@ exposed-modules: Test.ChasingBottoms, Test.ChasingBottoms.Approx,
   Test.ChasingBottoms.Nat, Test.ChasingBottoms.SemanticOrd,
   Test.ChasingBottoms.TimeOut
 other-modules: Test.ChasingBottoms.IsType
--- It would be nice if the tests in Test.ChasingBottoms.Tests could be
--- run automatically using Cabal.
+-- It would be nice if the tests that can be accessed through
+-- Test.ChasingBottoms.Tests.main could be run automatically using
+-- Cabal.
 ghc-options: -O2
