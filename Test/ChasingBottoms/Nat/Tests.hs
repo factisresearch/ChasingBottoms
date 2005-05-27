@@ -83,9 +83,9 @@ prop_Nat_mul_plus_left_dist (m :: Nat) n o = m * (n + o) == m * n + m * o
 prop_Nat_mul_plus_zero (m :: Nat) = m + 0 == m
 prop_Nat_mul_mul_unit (m :: Nat)  = m * 1 == m
 
-prop_Nat_minus (m :: Nat) n =
-  collect (m, n) $  -- OK distribution.
-  m >= n ==> (m - n) + n == m
+prop_Nat_minus n =
+  forAll (greaterThanOrEqual n) $ \m ->
+    (m - n) + n == m
 
 prop_Nat_signum_abs (m :: Nat) = signum m * abs m == m
 prop_Nat_signum_zero           = signum 0 == 0
