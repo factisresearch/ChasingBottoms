@@ -44,14 +44,15 @@ prop_Nat_Enum_pred (n :: Nat) = n > 0 ==> pred n == n - 1
 -- Testing Eq.
 
 prop_Nat_Eq_congruence = prop_Eq_congruence arbitrary equalTo notEqualTo
-  where
-  equalTo (n :: Nat) = return n
-  notEqualTo (n :: Nat) = do
-    m <- fmap succ arbitrary  -- m >= 1.
-    if m <= n then
-      elements [n - m, n + m]
-     else
-      return (n + m)
+
+equalTo (n :: Nat) = return n
+
+notEqualTo (n :: Nat) = do
+  m <- fmap succ arbitrary  -- m >= 1.
+  if m <= n then
+    elements [n - m, n + m]
+   else
+    return (n + m)
 
 -- Testing Show.
 
@@ -59,13 +60,12 @@ prop_Nat_Show (m :: Nat) = show m == show (toInteger m)
 
 -- Testing Ord.
 
-prop_Nat_Ord_refl (m :: Nat) = m <= m
-prop_Nat_Ord_antisym (m :: Nat) n =
-  collect (m, n) $  -- OK distribution.
-    m <= n && n <= m ==> m == n
-prop_Nat_Ord_trans (i :: Nat) j k =
-  collect (i, j, k) $  -- OK distribution.
-    i <= j && j <= k ==> i <= k
+prop_Nat_Ord_total_order = prop_Ord_total_order arbitrary
+                           equalTo notEqualTo greaterThanOrEqual
+
+greaterThanOrEqual (n :: Nat) = do
+  m <- arbitrary
+  return (n + m)
 
 -- Testing Num.
 
@@ -120,34 +120,40 @@ prop_Nat_toRational (m :: Nat) = toRational m == toInteger m % 1
 
 -- | All tests collected together.
 
-tests = runQuickCheckTests $
-          [ run prop_isSucc
-          , run prop_fromSucc
-          , run prop_natrec_add
-          , run prop_Nat_Enum_succ
-          , run prop_Nat_Enum_pred
-          , run prop_Nat_Show
-          , run prop_Nat_Ord_refl
-          , run prop_Nat_Ord_antisym
-          , run prop_Nat_Ord_trans
-          , run prop_Nat_mul_iterated_sum
-          , run prop_Nat_plus_assoc
-          , run prop_Nat_plus_comm
-          , run prop_Nat_mul_assoc
-          , run prop_Nat_mul_comm
-          , run prop_Nat_mul_plus_left_dist
-          , run prop_Nat_mul_plus_zero
-          , run prop_Nat_mul_mul_unit
-          , run prop_Nat_minus
-          , run prop_Nat_signum_abs
-          , run prop_Nat_signum_zero
-          , run prop_Nat_fromInteger_plus
-          , run prop_Nat_fromInteger_mul
-          , run prop_Nat_to_from
-          , run prop_Nat_from_to
-          , run prop_Nat_quotRem
-          , run prop_Nat_divMod
-          , run prop_Nat_quot_rem
-          , run prop_Nat_div_mod
-          , run prop_Nat_toRational
-          ] ++ map run prop_Nat_Eq_congruence
+tests = runQuickCheckTests theTests
+  where
+  theTests = map run (concat testLists) ++ singleTests
+
+  singleTests =
+    [ run prop_isSucc
+    , run prop_fromSucc
+    , run prop_natrec_add
+    , run prop_Nat_Enum_succ
+    , run prop_Nat_Enum_pred
+    , run prop_Nat_Show
+    , run prop_Nat_mul_iterated_sum
+    , run prop_Nat_plus_assoc
+    , run prop_Nat_plus_comm
+    , run prop_Nat_mul_assoc
+    , run prop_Nat_mul_comm
+    , run prop_Nat_mul_plus_left_dist
+    , run prop_Nat_mul_plus_zero
+    , run prop_Nat_mul_mul_unit
+    , run prop_Nat_minus
+    , run prop_Nat_signum_abs
+    , run prop_Nat_signum_zero
+    , run prop_Nat_fromInteger_plus
+    , run prop_Nat_fromInteger_mul
+    , run prop_Nat_to_from
+    , run prop_Nat_from_to
+    , run prop_Nat_quotRem
+    , run prop_Nat_divMod
+    , run prop_Nat_quot_rem
+    , run prop_Nat_div_mod
+    , run prop_Nat_toRational
+    ]
+
+  testLists =
+    [ prop_Nat_Eq_congruence
+    , prop_Nat_Ord_total_order
+    ]
