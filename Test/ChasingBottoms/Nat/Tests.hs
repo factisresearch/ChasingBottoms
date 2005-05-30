@@ -60,6 +60,14 @@ prop_Nat_Enum_pred =
   forAll largeNat $ \n ->
     n > 0 ==> pred n == n - 1
 
+prop_Nat_Enum_toEnum (n :: Int) =
+   n >= 0 ==> (toEnum n :: Nat) == fromInteger (toInteger n)
+prop_Nat_Enum_fromEnum (n :: Nat) =
+  n <= fromInteger (toInteger (maxBound :: Int)) ==>
+  toInteger (fromEnum n) == toInteger n
+
+-- enumFrom and friends have default definitions.
+
 -- Testing Eq.
 
 prop_Nat_Eq_congruence = eqIsCongruence arbitrary equalTo notEqualTo
@@ -150,6 +158,8 @@ tests = runQuickCheckTests theTests
     , run prop_natrec_add
     , run prop_Nat_Enum_succ
     , run prop_Nat_Enum_pred
+    , run prop_Nat_Enum_toEnum
+    , run prop_Nat_Enum_fromEnum
     , run prop_Nat_Show
     , run prop_Nat_mul_iterated_sum
     , run prop_Nat_plus_assoc

@@ -92,6 +92,8 @@ instance Enum Nat where
   pred = subtract 1
   toEnum = fromInteger . toInteger
   fromEnum = fromInteger . nat2int
+  -- Add tests for enumFrom and friends if the default definitions are
+  -- overridden.
 
 instance Show Nat where
   showsPrec _ = showString . show . nat2int
