@@ -2,6 +2,7 @@
 
 module Test.ChasingBottoms.SemanticOrd.Tests (tests) where
 
+tests :: [Bool]
 tests =
   [
 

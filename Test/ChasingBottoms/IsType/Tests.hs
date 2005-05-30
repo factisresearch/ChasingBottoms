@@ -4,6 +4,7 @@ module Test.ChasingBottoms.IsType.Tests (tests) where
 
 import Test.ChasingBottoms.IsType
 
+tests :: [Bool]
 tests =
     -- isFunction identifies functions.
   [ isFunction (id :: Char -> Char)  ==  True

@@ -10,6 +10,7 @@ import Test.ChasingBottoms.Approx
 import Test.ChasingBottoms.IsBottom
 import Test.ChasingBottoms.SemanticOrd
 
+tests :: IO Bool
 tests = do
   r1 <- timeOut n bottom
   r1b <- timeOut n $ return bottom

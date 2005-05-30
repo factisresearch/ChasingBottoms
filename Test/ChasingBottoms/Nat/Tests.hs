@@ -120,6 +120,7 @@ prop_Nat_toRational (m :: Nat) = toRational m == toInteger m % 1
 
 -- | All tests collected together.
 
+tests :: IO Bool
 tests = runQuickCheckTests theTests
   where
   theTests = map run (concat testLists) ++ singleTests

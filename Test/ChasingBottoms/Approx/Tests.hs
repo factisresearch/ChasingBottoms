@@ -153,6 +153,7 @@ approx_H = snd . approx_GH
 g1 = G2 (H1 (G2 (H2 'a')))
 h1 = H1 (G2 (H1 (G1 'b')))
 
+tests :: [Bool]
 tests =
     -- approx 0 = bottom.
   [ approx 0 ==! (bottom :: Int -> Int)

@@ -27,6 +27,7 @@ infiniteRecursion = leftInfinite' == leftInfinite'
 
 data A2 = A2 { aaa :: A2 } | C { ccc :: A2 }
 
+tests :: [Bool]
 tests =
     -- Basic cases.
   [ isBottom bottom  ==  True

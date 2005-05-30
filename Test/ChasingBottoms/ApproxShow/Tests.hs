@@ -23,6 +23,7 @@ pr n x template = do
 
 tst n x template = approxShow n x == template
 
+tests :: [Bool]
 tests =
   [ tst 4 left "B (B (B (B _ _) L) L) L"
   , tst 4 (bottom :: Bool) "_|_"
