@@ -18,6 +18,20 @@ import Data.Ratio
 
 default ()
 
+-- The default versions of succ and pred go via Ints, and hence
+-- perform incorrectly in the presence of large natural numbers. Hence
+-- this generator is needed. Other tests can possibly also fail in the
+-- presence of large natural numbers, but QuickCheck does not handle
+-- large numbers very well, especially not when coarbitrary is used,
+-- so we do not use this generator for all tests. Furthermore
+-- defaulting is turned off here and in Test.ChasingBottoms.Nat, and
+-- that should minimise surprises.
+
+largeNat :: Gen Nat
+largeNat = do
+  n <- choose (0, 2 * toInteger (maxBound :: Int))
+  return (fromInteger n)
+
 -- Testing isSucc.
 
 prop_isSucc n = isSucc n == (n > 0)
@@ -39,8 +53,12 @@ prop_natrec_add m n = natrec m (\_ o -> succ o) n == m + n
 
 -- Testing Enum.
 
-prop_Nat_Enum_succ (n :: Nat) = succ n == n + 1
-prop_Nat_Enum_pred (n :: Nat) = n > 0 ==> pred n == n - 1
+prop_Nat_Enum_succ =
+  forAll largeNat $ \n ->
+    succ n == n + 1
+prop_Nat_Enum_pred =
+  forAll largeNat $ \n ->
+    n > 0 ==> pred n == n - 1
 
 -- Testing Eq.
 

@@ -88,6 +88,8 @@ instance Integral Nat where
     steal2 divMod a b
 
 instance Enum Nat where
+  succ = (+ 1)
+  pred = subtract 1
   toEnum = fromInteger . toInteger
   fromEnum = fromInteger . nat2int
 
