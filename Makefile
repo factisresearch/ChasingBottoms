@@ -31,6 +31,9 @@ ChasingBottoms/Nat/Tests.hs ChasingBottoms/SemanticOrd/Tests.hs		\
 ChasingBottoms/TimeOut/Tests.hs ChasingBottoms/TestUtilities.hs		\
 ChasingBottoms/TestLibraryWhenCompiling.hs
 
+# GHC packages whose documentation we want to hyperlink to.
+PACKAGES = base QuickCheck
+
 FILES_TO_BE_EXCLUDED = .boring
 
 CPPHS_PROCESSED_SUFFIX = .processed
@@ -47,8 +50,8 @@ $(DOCDIR) : $(addprefix Test/,$(EXPOSED_SOURCES:=$(CPPHS_PROCESSED_SUFFIX))) \
 	-rm -rf $(DOCDIR)
 	mkdir -p $(DOCDIR)
 	$(HADDOCK) -h --title="Chasing Bottoms" --prologue=Header -odocs \
-	  -i$(GHC_DOC_URL)/base,$(GHC_DOC_PATH)/base/base.haddock \
-	  -i$(GHC_DOC_URL)/QuickCheck,$(GHC_DOC_PATH)/QuickCheck/QuickCheck.haddock \
+	  $(foreach pkg,$(PACKAGES),\
+             -i$(GHC_DOC_URL)/$(pkg),$(GHC_DOC_PATH)/$(pkg)/$(pkg).haddock) \
 	  $(filter Test/%,$^)
 
 # Target used by darcs dist.
