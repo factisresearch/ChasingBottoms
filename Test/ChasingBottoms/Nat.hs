@@ -22,7 +22,7 @@ import Test.QuickCheck
 #endif
 import Data.Ratio ((%))
 
-default (Integer)
+default ()
 
 -- | Natural numbers.
 newtype Nat = Nat { nat2int :: Integer } deriving (Eq, Ord)

@@ -16,6 +16,8 @@ import Test.QuickCheck.Batch
 import Data.List
 import Data.Ratio
 
+default ()
+
 -- Testing isSucc.
 
 prop_isSucc n = isSucc n == (n > 0)
@@ -87,7 +89,7 @@ prop_Nat_minus n =
     (m - n) + n == m
 
 prop_Nat_signum_abs (m :: Nat) = signum m * abs m == m
-prop_Nat_signum_zero           = signum 0 == 0
+prop_Nat_signum_zero           = (signum 0 :: Nat) == 0
 
 prop_Nat_fromInteger_plus m n =
   m >= 0 && n >= 0 ==>
