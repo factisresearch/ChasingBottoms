@@ -15,7 +15,6 @@ import Test.QuickCheck.Batch
 #endif
 import Data.List
 import Data.Ratio
-import Text.Show.Functions
 
 -- Testing isSucc.
 

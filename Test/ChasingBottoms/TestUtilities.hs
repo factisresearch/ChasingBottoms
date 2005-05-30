@@ -22,6 +22,7 @@ import Test.QuickCheck
 import Test.QuickCheck.Batch
 #endif
 import Data.List
+import Text.Show.Functions
 
 ------------------------------------------------------------------------
 -- Batch execution of QuickCheck tests
