@@ -5,6 +5,7 @@
 module Test.ChasingBottoms.Nat.Tests (tests) where
 
 import Test.ChasingBottoms.Nat
+import Test.ChasingBottoms.SemanticOrd
 import Test.ChasingBottoms.TestUtilities
 #if __GLASGOW_HASKELL__ <= 602
 import Debug.QuickCheck
@@ -13,6 +14,7 @@ import Debug.QuickCheck.Batch
 import Test.QuickCheck
 import Test.QuickCheck.Batch
 #endif
+import Data.Maybe
 import Data.List
 import Data.Ratio
 
@@ -145,6 +147,54 @@ prop_Nat_div_mod (m :: Nat) n =
 
 prop_Nat_toRational (m :: Nat) = toRational m == toInteger m % 1
 
+-- Since the implementation is based on Integers I'd like to test that
+-- we can't construct values of the form "Nat i" where i is a negative
+-- Integer. (This can be seen as a test of the observation function
+-- toInteger.)
+
+prop_Nat_closed = [ unary (fromJust . fromSucc)
+                    -- Ord
+                  , binary max
+                  , binary min
+                    -- Enum
+                    -- enumFrom and friends have default definitions.
+                  , unary succ
+                  , unary pred
+                  , unary' toEnum
+                    -- Num
+                  , binary (+)
+                  , binary (-)
+                  , binary (*)
+                  , unary negate
+                  , unary abs
+                  , unary signum
+                  , unary' fromInteger
+                    -- Integral
+                  , binary quot
+                  , binary rem
+                  , binary div
+                  , binary mod
+                  , binary (fst .^^ quotRem)
+                  , binary (snd .^^ quotRem)
+                  , binary (fst .^^ divMod)
+                  , binary (snd .^^ divMod)
+                  ]
+  where
+  ok (n :: Nat) = (toInteger n >= 0) <=! True
+
+  unary (f :: Nat -> Nat) = unary' f
+
+  unary' f =
+    forAll arbitrary $ \x ->
+      ok (f x)
+
+  binary f =
+    forAll arbitrary $ \(m :: Nat) ->
+    forAll arbitrary $ \(n :: Nat) ->
+      ok (f m n)
+
+  f .^^ g = \x y -> f (g x y)
+
 -- | All tests collected together.
 
 tests :: IO Bool
@@ -186,4 +236,5 @@ tests = runQuickCheckTests theTests
   testLists =
     [ prop_Nat_Eq_congruence
     , prop_Nat_Ord_total_order
+    , prop_Nat_closed
     ]
