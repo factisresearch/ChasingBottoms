@@ -19,7 +19,7 @@ notbot x = notbot x
 
 data T' a = L' | B' (T' a) (T' a) deriving Eq
 
-instance Monad T' where
+instance Monad T'
 
 leftInfinite' = B' leftInfinite' L'
 
