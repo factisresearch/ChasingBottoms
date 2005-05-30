@@ -24,6 +24,13 @@ ChasingBottoms/ApproxShow.hs ChasingBottoms/IsBottom.hs		\
 ChasingBottoms/Nat.hs ChasingBottoms/SemanticOrd.hs		\
 ChasingBottoms/TimeOut.hs
 
+HIDDEN_SOURCES = ChasingBottoms/IsType.hs ChasingBottoms/Tests.hs	\
+ChasingBottoms/Approx/Tests.hs ChasingBottoms/ApproxShow/Tests.hs	\
+ChasingBottoms/IsBottom/Tests.hs ChasingBottoms/IsType/Tests.hs		\
+ChasingBottoms/Nat/Tests.hs ChasingBottoms/SemanticOrd/Tests.hs		\
+ChasingBottoms/TimeOut/Tests.hs ChasingBottoms/TestUtilities.hs		\
+ChasingBottoms/TestLibraryWhenCompiling.hs
+
 FILES_TO_BE_EXCLUDED = .boring
 
 CPPHS_PROCESSED_SUFFIX = .processed
