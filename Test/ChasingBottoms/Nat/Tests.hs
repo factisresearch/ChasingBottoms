@@ -42,7 +42,7 @@ prop_Nat_Enum_pred (n :: Nat) = n > 0 ==> pred n == n - 1
 
 -- Testing Eq.
 
-prop_Nat_Eq_congruence = prop_Eq_congruence arbitrary equalTo notEqualTo
+prop_Nat_Eq_congruence = eqIsCongruence arbitrary equalTo notEqualTo
 
 equalTo (n :: Nat) = return n
 
@@ -59,8 +59,8 @@ prop_Nat_Show (m :: Nat) = show m == show (toInteger m)
 
 -- Testing Ord.
 
-prop_Nat_Ord_total_order = prop_Ord_total_order arbitrary
-                           equalTo notEqualTo greaterThanOrEqual
+prop_Nat_Ord_total_order = ordIsTotalOrder arbitrary
+                             equalTo notEqualTo greaterThanOrEqual
 
 greaterThanOrEqual (n :: Nat) = do
   m <- arbitrary

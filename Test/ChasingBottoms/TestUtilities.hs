@@ -3,15 +3,19 @@
 -- | Some utilities that are part of the testing framework.
 
 module Test.ChasingBottoms.TestUtilities
-  ( runQuickCheckTests
-  , prop_equivalence_relation
-  , prop_congruence
-  , prop_Eq_congruence
-  , prop_partial_order
-  , prop_total_order
-  , prop_order_operators
-  , prop_total_order_operators
-  , prop_Ord_total_order
+  ( -- * Batch execution of QuickCheck tests
+    runQuickCheckTests
+    -- * Various algebraic properties
+    -- ** Equivalence and congruence
+  , isEquivalenceRelation
+  , isCongruence
+  , eqIsCongruence
+    -- ** Partial and total orders
+  , isPartialOrder
+  , isTotalOrder
+  , isPartialOrderOperators
+  , isTotalOrderOperators
+  , ordIsTotalOrder
   ) where
 
 #if __GLASGOW_HASKELL__ <= 602
@@ -71,7 +75,7 @@ runQuickCheckTests tests = do
 -- | Tests for an equivalence relation. Requires that the relation is
 -- neither always false nor always true.
 
-prop_equivalence_relation
+isEquivalenceRelation
   :: Show a
      => Gen a
      -- ^ Generator for arbitrary element.
@@ -82,7 +86,7 @@ prop_equivalence_relation
      -> (a -> a -> Bool)
      -- ^ The relation.
      -> [Property]
-prop_equivalence_relation element equalTo notEqualTo (===) =
+isEquivalenceRelation element equalTo notEqualTo (===) =
   [reflexive, symmetric1, symmetric2, transitive]
   where
   x /== y = not (x === y)
@@ -104,7 +108,7 @@ prop_equivalence_relation element equalTo notEqualTo (===) =
 -- | Tests for a congruence. 'Arbitrary' instance needed for
 -- 'coarbitrary'.
 
-prop_congruence
+isCongruence
   :: (Show a, Arbitrary a)
      => Gen a
      -- ^ Generator for arbitrary element.
@@ -115,8 +119,8 @@ prop_congruence
      -> (a -> a -> Bool)
      -- ^ The relation.
      -> [Property]
-prop_congruence element equalTo notEqualTo (===) =
-  prop_equivalence_relation element equalTo notEqualTo (===) ++ [cong]
+isCongruence element equalTo notEqualTo (===) =
+  isEquivalenceRelation element equalTo notEqualTo (===) ++ [cong]
   where
   cong = forAll arbitrary $ \f ->
            forAll (pair element equalTo) $ \(x, y) ->
@@ -125,7 +129,7 @@ prop_congruence element equalTo notEqualTo (===) =
 -- | Test that an 'Eq' instance is a congruence, and that '/=' is
 -- the negation of '=='.
 
-prop_Eq_congruence
+eqIsCongruence
   :: (Show a, Arbitrary a, Eq a)
      => Gen a
      -- ^ Generator for arbitrary element.
@@ -134,8 +138,8 @@ prop_Eq_congruence
      -> (a -> Gen a)
      -- ^ Generator for element not equivalent to argument.
      -> [Property]
-prop_Eq_congruence element equalTo notEqualTo =
-  prop_congruence element equalTo notEqualTo (==) ++ [eq_neq1, eq_neq2]
+eqIsCongruence element equalTo notEqualTo =
+  isCongruence element equalTo notEqualTo (==) ++ [eq_neq1, eq_neq2]
   where
   eq_neq1 = forAll (pair element equalTo) $ \(x, y) ->
               x == y && not (x /= y)
@@ -144,7 +148,7 @@ prop_Eq_congruence element equalTo notEqualTo =
 
 -- | Tests for a partial order.
 
-prop_partial_order
+isPartialOrder
   :: Show a
      => Gen a
      -- ^ Generator for arbitrary element.
@@ -161,7 +165,7 @@ prop_partial_order
      -> (a -> a -> Bool)
      -- ^ The relation.
      -> [Property]
-prop_partial_order element equalTo differentFrom greaterThan (==.) (<=.) =
+isPartialOrder element equalTo differentFrom greaterThan (==.) (<=.) =
   [reflexive, antisymmetric1, antisymmetric2, transitive]
   where
   infix 4 ==., <=.
@@ -184,7 +188,7 @@ prop_partial_order element equalTo differentFrom greaterThan (==.) (<=.) =
 
 -- | Tests for a total order.
 
-prop_total_order
+isTotalOrder
   :: Show a
      => Gen a
      -- ^ Generator for arbitrary element.
@@ -201,8 +205,8 @@ prop_total_order
      -> (a -> a -> Bool)
      -- ^ The relation.
      -> [Property]
-prop_total_order element equalTo differentFrom greaterThan (==.) (<=.) =
-  prop_partial_order element equalTo differentFrom greaterThan (==.) (<=.)
+isTotalOrder element equalTo differentFrom greaterThan (==.) (<=.) =
+  isPartialOrder element equalTo differentFrom greaterThan (==.) (<=.)
   ++ [total]
   where
   infix 4 <=.
@@ -212,8 +216,10 @@ prop_total_order element equalTo differentFrom greaterThan (==.) (<=.) =
     forAll element $ \y ->
       x <=. y || y <=. x
 
--- | Tests relating various partial order operators.
-prop_order_operators
+-- | Tests relating various partial order operators. Does not include
+-- any tests from 'isPartialOrder'.
+
+isPartialOrderOperators
   :: Show a
      => Gen a
      -- ^ Generator for arbitrary element.
@@ -228,7 +234,7 @@ prop_order_operators
      -> (a -> a -> Bool)
      -- ^ Greater than.
      -> [Property]
-prop_order_operators element (==.) (<=.) (<.) (>=.) (>.) =
+isPartialOrderOperators element (==.) (<=.) (<.) (>=.) (>.) =
   [lt_le, gt_le, ge_lt]
   where
   infix 4 ==., <=., <., >=., >.
@@ -249,9 +255,10 @@ prop_order_operators element (==.) (<=.) (<.) (>=.) (>.) =
       (x >=. y) == not (x <. y)
 
 
--- | Tests relating various total order operators and functions.
+-- | Tests relating various total order operators and functions. Does
+-- not include any tests from 'isTotalOrder'.
 
-prop_total_order_operators
+isTotalOrderOperators
   :: Show a
      => Gen a
      -- ^ Generator for arbitrary element.
@@ -272,8 +279,8 @@ prop_total_order_operators
      -> (a -> a -> a)
      -- ^ Maximum.
      -> [Property]
-prop_total_order_operators element (==.) (<=.) (<.) (>=.) (>.) cmp mn mx =
-  prop_order_operators element (==.) (<=.) (<.) (>=.) (>.)
+isTotalOrderOperators element (==.) (<=.) (<.) (>=.) (>.) cmp mn mx =
+  isPartialOrderOperators element (==.) (<=.) (<.) (>=.) (>.)
   ++ [compare_lt_eq_gt, compare_max, compare_min]
   where
   compare_lt_eq_gt =
@@ -304,7 +311,7 @@ prop_total_order_operators element (==.) (<=.) (<.) (>=.) (>.) cmp mn mx =
 
 -- | Tests that an 'Ord' instance should satisfy to be a total order.
 
-prop_Ord_total_order
+ordIsTotalOrder
   :: (Show a, Ord a)
      => Gen a
      -- ^ Generator for arbitrary element.
@@ -315,9 +322,9 @@ prop_Ord_total_order
      -> (a -> Gen a)
      -- ^ Generator for element greater than or equal to argument.
      -> [Property]
-prop_Ord_total_order element equalTo differentFrom greaterThan =
-  prop_total_order_operators element (==) (<=) (<) (>=) (>) compare min max
-  ++ prop_total_order element equalTo differentFrom greaterThan (==) (<=)
+ordIsTotalOrder element equalTo differentFrom greaterThan =
+  isTotalOrderOperators element (==) (<=) (<) (>=) (>) compare min max
+  ++ isTotalOrder element equalTo differentFrom greaterThan (==) (<=)
 
 ------------------------------------------------------------------------
 -- Local helper functions
