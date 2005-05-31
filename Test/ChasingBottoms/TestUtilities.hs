@@ -6,6 +6,9 @@ module Test.ChasingBottoms.TestUtilities
   ( -- * Batch execution of QuickCheck tests
     runQuickCheckTests
     -- * Various algebraic properties
+  , isAssociative
+  , isCommutative
+  , isIdempotent
     -- ** Equivalence and congruence
   , isEquivalenceRelation
   , isCongruence
@@ -71,6 +74,53 @@ runQuickCheckTests tests = do
 
 ------------------------------------------------------------------------
 -- Testing various algebraic properties
+
+-- | Test for associativity.
+
+isAssociative
+  :: Show a
+     => Gen (a, a, a)
+     -- ^ Generator for arbitrary elements, possibly related in some
+     -- way to make the test more meaningful.
+     -> (a -> a -> Bool)
+     -- ^ Equality test.
+     -> (a -> a -> a)
+     -- ^ The operation.
+     -> Property
+isAssociative triple (==.) (+.) =
+  forAll triple $ \(x, y, z) ->
+    ((x +. y) +. z) ==. (x +. (y +. z))
+
+-- | Test for commutativity.
+
+isCommutative
+  :: Show a
+     => Gen (a, a)
+     -- ^ Generator for arbitrary elements, possibly related in some
+     -- way to make the test more meaningful.
+     -> (b -> b -> Bool)
+     -- ^ Equality test.
+     -> (a -> a -> b)
+     -- ^ The operation.
+     -> Property
+isCommutative pair (==.) (+.) =
+  forAll pair $ \(x, y) ->
+    (x +. y) ==. (y +. x)
+
+-- | Test for idempotence.
+
+isIdempotent
+  :: Show a
+     => Gen a
+     -- ^ Generator for arbitrary element.
+     -> (a -> a -> Bool)
+     -- ^ Equality test.
+     -> (a -> a -> a)
+     -- ^ The operation.
+     -> Property
+isIdempotent element (==.) (+.) =
+  forAll element $ \x ->
+    (x +. x) ==. x
 
 -- | Tests for an equivalence relation. Requires that the relation is
 -- neither always false nor always true.
