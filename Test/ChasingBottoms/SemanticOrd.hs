@@ -30,6 +30,10 @@
 -- equal to 'bottom'. This functionality is implemented using
 -- 'isBottomTimeOut'.
 --
+-- Note that the use of implicit parameters here is more experimental
+-- than the rest of the library, and hence more likely to be removed
+-- in future versions.
+--
 -- One could imagine using QuickCheck for testing equality of
 -- functions, but I have not managed to tweak the type system so that
 -- it can be done transparently.
