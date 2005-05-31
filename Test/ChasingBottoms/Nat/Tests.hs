@@ -72,7 +72,9 @@ prop_Nat_Enum_fromEnum (n :: Nat) =
 
 -- Testing Eq.
 
-prop_Nat_Eq_congruence = eqIsCongruence arbitrary equalTo notEqualTo
+prop_Nat_Eq_congruence =
+  eqIsCongruence arbitrary equalTo notEqualTo
+                 (arbitrary :: Gen (Nat -> Integer))
 
 equalTo (n :: Nat) = return n
 

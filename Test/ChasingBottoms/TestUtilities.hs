@@ -160,12 +160,11 @@ isEquivalenceRelation element equalTo notEqualTo (===) =
                  forAll (equalTo y) $ \z ->
                    x === z
 
-
--- | Tests for a congruence. 'Arbitrary' instance needed for
--- 'coarbitrary'.
+-- | Tests for a congruence. Also tests that the negated relation is
+-- the negation of the relation.
 
 isCongruence
-  :: (Show a, Arbitrary a)
+  :: (Show a, Eq b)
      => Gen a
      -- ^ Generator for arbitrary element.
      -> (a -> Gen a)
@@ -174,33 +173,40 @@ isCongruence
      -- ^ Generator for element not equivalent to argument.
      -> (a -> a -> Bool)
      -- ^ The relation.
+     -> (a -> a -> Bool)
+     -- ^ The negated relation.
+     -> Gen (a -> b)
+     -- ^ Generator for functions.
+     -> (b -> b -> Bool)
+     -- ^ Equality for function result type.
      -> [Property]
-isCongruence element equalTo notEqualTo (===) =
-  isEquivalenceRelation element equalTo notEqualTo (===) ++ [cong]
+isCongruence element equalTo notEqualTo (===) (/==) function (.===) =
+  isEquivalenceRelation element equalTo notEqualTo (===)
+  ++ [cong, eq_neq1, eq_neq2]
   where
-  cong = forAll arbitrary $ \f ->
+  cong = forAll function $ \f ->
            forAll (pair element equalTo) $ \(x, y) ->
-             f x == (f y :: Integer)
+             f x .=== f y
+  eq_neq1 = forAll (pair element equalTo) $ \(x, y) ->
+              x === y && not (x /== y)
+  eq_neq2 = forAll (pair element notEqualTo) $ \(x, y) ->
+              not (x === y) && x /== y
 
--- | Test that an 'Eq' instance is a congruence, and that '/=' is
--- the negation of '=='.
+-- | Test that an 'Eq' instance is a congruence.
 
 eqIsCongruence
-  :: (Show a, Arbitrary a, Eq a)
+  :: (Show a, Eq a, Eq b)
      => Gen a
      -- ^ Generator for arbitrary element.
      -> (a -> Gen a)
      -- ^ Generator for element equivalent to argument.
      -> (a -> Gen a)
      -- ^ Generator for element not equivalent to argument.
+     -> Gen (a -> b)
+     -- ^ Generator for functions.
      -> [Property]
-eqIsCongruence element equalTo notEqualTo =
-  isCongruence element equalTo notEqualTo (==) ++ [eq_neq1, eq_neq2]
-  where
-  eq_neq1 = forAll (pair element equalTo) $ \(x, y) ->
-              x == y && not (x /= y)
-  eq_neq2 = forAll (pair element notEqualTo) $ \(x, y) ->
-              not (x == y) && x /= y
+eqIsCongruence element equalTo notEqualTo function =
+  isCongruence element equalTo notEqualTo (==) (/=) function (==)
 
 -- | Tests for a partial order.
 
