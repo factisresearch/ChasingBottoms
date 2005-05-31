@@ -285,6 +285,8 @@ isPartialOrderOperators
   :: Show a
      => Gen a
      -- ^ Generator for arbitrary element.
+     -> (a -> Gen a)
+     -- ^ Generator for element greater than or equal to argument.
      -> (a -> a -> Bool)
      -- ^ Equal.
      -> (a -> a -> Bool)
@@ -296,26 +298,28 @@ isPartialOrderOperators
      -> (a -> a -> Bool)
      -- ^ Greater than.
      -> [Property]
-isPartialOrderOperators element (==.) (<=.) (<.) (>=.) (>.) =
-  [lt_le, gt_le, ge_lt]
+isPartialOrderOperators element greaterThan (==.) (<=.) (<.) (>=.) (>.) =
+  [lt_le, gt_ge, ge_le, lt_gt]
   where
   infix 4 ==., <=., <., >=., >.
 
+  twoElems = pair3 element greaterThan
+
   lt_le =
-    forAll element $ \x ->
-    forAll element $ \y ->
+    forAll twoElems $ \(x, y) ->
       (x <. y) == (x <=. y && not (x ==. y))
 
-  gt_le =
-    forAll element $ \x ->
-    forAll element $ \y ->
-      (x >. y) == not (x <=. y)
+  gt_ge =
+    forAll twoElems $ \(x, y) ->
+      (x >. y) == (x >=. y && not (x ==. y))
 
-  ge_lt =
-    forAll element $ \x ->
-    forAll element $ \y ->
-      (x >=. y) == not (x <. y)
+  ge_le =
+    forAll twoElems $ \(x, y) ->
+      (x >=. y) == (y <=. x)
 
+  lt_gt =
+    forAll twoElems $ \(x, y) ->
+      (x <. y) == (y >. x)
 
 -- | Tests relating various total order operators and functions. Does
 -- not include any tests from 'isTotalOrder'.
@@ -324,6 +328,8 @@ isTotalOrderOperators
   :: Show a
      => Gen a
      -- ^ Generator for arbitrary element.
+     -> (a -> Gen a)
+     -- ^ Generator for element greater than or equal to argument.
      -> (a -> a -> Bool)
      -- ^ Equal.
      -> (a -> a -> Bool)
@@ -341,29 +347,29 @@ isTotalOrderOperators
      -> (a -> a -> a)
      -- ^ Maximum.
      -> [Property]
-isTotalOrderOperators element (==.) (<=.) (<.) (>=.) (>.) cmp mn mx =
-  isPartialOrderOperators element (==.) (<=.) (<.) (>=.) (>.)
+isTotalOrderOperators element greaterThan
+                      (==.) (<=.) (<.) (>=.) (>.) cmp mn mx =
+  isPartialOrderOperators element greaterThan (==.) (<=.) (<.) (>=.) (>.)
   ++ [compare_lt_eq_gt, compare_max, compare_min]
   where
+  twoElems = pair3 element greaterThan
+
   compare_lt_eq_gt =
-    forAll element $ \x ->
-    forAll element $ \y ->
+    forAll twoElems $ \(x, y) ->
       case cmp x y of
         LT -> x <. y
         EQ -> x ==. y
         GT -> x >. y
 
   compare_max =
-    forAll element $ \x ->
-    forAll element $ \y ->
+    forAll twoElems $ \(x, y) ->
       case cmp x y of
         LT -> x `mx` y ==. y
         GT -> x `mx` y ==. x
         EQ -> elemBy (==.) (x `mx` y) [x, y]
 
   compare_min =
-    forAll element $ \x ->
-    forAll element $ \y ->
+    forAll twoElems $ \(x, y) ->
       case cmp x y of
         LT -> x `mn` y ==. x
         GT -> x `mn` y ==. y
@@ -385,7 +391,8 @@ ordIsTotalOrder
      -- ^ Generator for element greater than or equal to argument.
      -> [Property]
 ordIsTotalOrder element equalTo differentFrom greaterThan =
-  isTotalOrderOperators element (==) (<=) (<) (>=) (>) compare min max
+  isTotalOrderOperators element greaterThan
+                        (==) (<=) (<) (>=) (>) compare min max
   ++ isTotalOrder element equalTo differentFrom greaterThan (==) (<=)
 
 ------------------------------------------------------------------------
