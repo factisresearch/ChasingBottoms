@@ -1,6 +1,9 @@
 ChasingBottoms
 --------------
 
+Building
+--------
+
 To build: Use Cabal, or use ghc --make Test.ChasingBottoms. (If
 Test.ChasingBottoms is already installed you may need to add something
 like -ignore-package ChasingBottoms-X.Y.Z.)
