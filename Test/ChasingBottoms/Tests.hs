@@ -1,7 +1,6 @@
 {-# OPTIONS -fglasgow-exts -cpp #-}
 
--- | Tests of everything related to "Test.ChasingBottoms". Not finished
---   yet. (Missing: "Test.ChasingBottoms.SemanticOrd".)
+-- | Tests of almost everything related to "Test.ChasingBottoms".
 
 module Test.ChasingBottoms.Tests (main) where
 
@@ -10,7 +9,7 @@ import qualified Test.ChasingBottoms.ApproxShow.Tests  as ApproxShow
 import qualified Test.ChasingBottoms.IsBottom.Tests    as IsBottom
 import qualified Test.ChasingBottoms.IsType.Tests      as IsType
 import qualified Test.ChasingBottoms.Nat.Tests         as Nat
--- import qualified Test.ChasingBottoms.SemanticOrd.Tests as SemanticOrd
+import qualified Test.ChasingBottoms.SemanticOrd.Tests as SemanticOrd
 import qualified Test.ChasingBottoms.TimeOut.Tests     as TimeOut
 
 -- | A class for things that can be tested.
@@ -59,6 +58,6 @@ main = fmap and $ sequence theTests
                    , test "IsBottom:"    IsBottom.tests
                    , test "IsType:"      IsType.tests
                    , test "Nat:"         Nat.tests
-                   -- , test "SemanticOrd:" SemanticOrd.tests
+                   , test "SemanticOrd:" SemanticOrd.tests
                    , test "TimeOut:"     TimeOut.tests
                    ]
