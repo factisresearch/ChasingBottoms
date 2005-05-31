@@ -75,8 +75,15 @@ runQuickCheckTests tests = do
   showArgs :: [[String]] -> String
   showArgs args
     | all null args = ""
-    | otherwise     = unlines . map (indent . concat . intersperse ", ") $ args
+    | otherwise     =
+        unlines
+        . map (indent . uncurry (++)
+               . (formatNum *** (concat . intersperse ", ")))
+        . sortBy (\x y -> compare (fst y) (fst x))
+        . map (length &&& head) . group . sort
+        $ args
     where indent = ("  " ++)
+          formatNum = flip shows ": "
 
 ------------------------------------------------------------------------
 -- Testing various algebraic properties
