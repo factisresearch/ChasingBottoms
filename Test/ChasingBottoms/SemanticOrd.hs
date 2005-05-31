@@ -52,6 +52,8 @@ import Test.ChasingBottoms.Approx
 
 infix 4 <!, <=!, ==!, >=!, >!, /=!
 infix 4 <?, <=?, ==?, >=?, >?, /=?
+infix 5 \/!, \/?
+infixl 5 /\!, /\?
 
 -- | 'SemanticEq' contains methods for testing whether two terms are
 -- semantically equal.
