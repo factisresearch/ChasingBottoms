@@ -11,6 +11,8 @@ like -ignore-package ChasingBottoms-X.Y.Z.)
 Do not use Cabal to build the documentation. Use make docs instead.
 You may need to edit the Makefile first.
 
+To run through the test suite, execute Test.ChasingBottoms.Tests.main.
+
 Possible future work
 --------------------
 
