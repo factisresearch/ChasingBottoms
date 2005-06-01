@@ -19,7 +19,7 @@ import Debug.QuickCheck.Batch (run)
 import Test.QuickCheck
 import Test.QuickCheck.Batch (run)
 #endif
-import Data.Generics hiding (GT)
+import Data.Generics
 import Control.Monad
 import Data.Maybe
 
@@ -345,10 +345,10 @@ prop_SemanticOrd_partial_order element notEqualTo greaterThan joinable =
   compare =
     forAll twoElems $ \(x, y) ->
       case semanticCompare x y of
-        Nothing -> not (x <=! y) && not (x >=! y)
-        Just LT -> x <! y
-        Just EQ -> x ==! y
-        Just GT -> x >! y
+        Nothing         -> not (x <=! y) && not (x >=! y)
+        Just LT         -> x <! y
+        Just EQ         -> x ==! y
+        Just Prelude.GT -> x >! y
 
   meet_associative = isAssociative (oneof [ liftM3 (,,) element element element
                                           , triple element joinable joinable
