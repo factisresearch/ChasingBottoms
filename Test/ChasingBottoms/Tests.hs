@@ -52,7 +52,14 @@ instance Test (IO Bool) where
 -- them succeeded.
 
 main :: IO Bool
-main = fmap and $ sequence theTests
+main = do
+  ok <- fmap and $ sequence theTests
+  putStrLn ""
+  if ok then
+    putStrLn "All tests succeeded."
+   else
+    putStrLn "At least one test failed."
+  return ok
   where theTests = [ test "Approx:"      Approx.tests
                    , test "ApproxShow:"  ApproxShow.tests
                    , test "IsBottom:"    IsBottom.tests
