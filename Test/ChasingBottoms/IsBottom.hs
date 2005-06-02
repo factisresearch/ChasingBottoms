@@ -10,7 +10,12 @@
 -- Portability :  non-portable (exceptions, implicit parameters)
 --
 
-module Test.ChasingBottoms.IsBottom(isBottom, bottom, isBottomTimeOut) where
+module Test.ChasingBottoms.IsBottom
+  ( isBottom
+  , bottom
+  , nonBottomError
+  , isBottomTimeOut
+  ) where
 
 import Prelude hiding (catch)
 import Control.Exception (catch, throw, Exception(..), evaluate)
@@ -51,6 +56,12 @@ isBottom = let ?timeOutLimit = Nothing in isBottomTimeOut
 -- 'isBottom'.
 bottom :: a
 bottom = error "_|_"
+
+-- | @'nonBottomError' s@ raises an exception ('AssertionFailed') that
+-- is not caught by 'isBottom'. Use @s@ to describe the exception.
+
+nonBottomError :: String -> a
+nonBottomError = throw . AssertionFailed
 
 -- | 'isBottomTimeOut' works like 'isBottom', but if @?timeOutLimit@
 -- is @'Just' lim@, then computations taking more than @lim@ seconds are

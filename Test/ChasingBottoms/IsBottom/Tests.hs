@@ -71,7 +71,9 @@ tests =
     -- might be optimisation dependent.
     -- , isException (isBottom infiniteRecursion)  ==  True
 
-    -- Some other exceptions that are not caught.
+    -- Some other exceptions that are not caught, including
+    -- nonBottomError.
   , isException (isBottom (unsafePerformIO $ exitWith ExitSuccess))  ==  True
   , isException (isBottom (1 `div` 0))  ==  True
+  , isException (nonBottomError "...")  ==  True
   ]
