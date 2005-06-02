@@ -30,50 +30,50 @@ data A2 = A2 { aaa :: A2 } | C { ccc :: A2 }
 tests :: [Bool]
 tests =
     -- Basic cases.
-  [ isBottom bottom  ==  True
-  , isBottom undefined  ==  True
-  , isBottom (error "...")  ==  True
+  [ isBottom bottom
+  , isBottom undefined
+  , isBottom (error "...")
     -- This sometimes leads to a stack overflow.
-    -- , isBottom bot  ==  True
+    -- , isBottom bot
 
     -- const bottom /= bottom.
-  , isBottom notbot  ==  False
-  , isBottom (const bottom)  ==  False
+  , not (isBottom notbot)
+  , not (isBottom (const bottom))
 
     -- Other types also lifted.
-  , isBottom (bottom, bottom)  ==  False
-  , isBottom (Just bottom)  ==  False
+  , not (isBottom (bottom, bottom))
+  , not (isBottom (Just bottom))
 
     -- Pattern match failure.
-  , isBottom (let (x, y) = bottom in x :: Bool)  ==  True
-  , isBottom (let Just x = Nothing in x :: Char)  ==  True
+  , isBottom (let (x, y) = bottom in x :: Bool)
+  , isBottom (let Just x = Nothing in x :: Char)
 
     -- Nonterminating, but not bottom.
-  , isBottom [1..]  ==  False
+  , not (isBottom [1..])
 
     -- Missing methods.
     -- Skip this test to avoid compiler warnings.
-  , (isBottom (L' >> L'))  ==  True
+  , isBottom (L' >> L')
 
     -- Array stuff.
-  , isBottom (array (1,0) [] ! 0)  ==  True
-  , isBottom (array (0,0) [] ! 0)  ==  True
+  , isBottom (array (1,0) [] ! 0)
+  , isBottom (array (0,0) [] ! 0)
 
     -- Record stuff.
     -- Skip the first one to avoid compiler warnings.
-  , isBottom (let x = A2 {} in aaa x)  ==  True
-  , isBottom (let x = A2 { aaa = x } in ccc x)  ==  True
-  , isBottom (let x = A2 { aaa = x } in x { ccc = x })  ==  True
+  , isBottom (let x = A2 {} in aaa x)
+  , isBottom (let x = A2 { aaa = x } in ccc x)
+  , isBottom (let x = A2 { aaa = x } in x { ccc = x })
 
     -- Infinite recursion, no data produced, should yield stack
     -- overflow...
     -- Not a quick test (on some machines, anyway). And the result
     -- might be optimisation dependent.
-    -- , isException (isBottom infiniteRecursion)  ==  True
+    -- , isException (isBottom infiniteRecursion)
 
     -- Some other exceptions that are not caught, including
     -- nonBottomError.
-  , isException (isBottom (unsafePerformIO $ exitWith ExitSuccess))  ==  True
-  , isException (isBottom (1 `div` 0))  ==  True
-  , isException (nonBottomError "...")  ==  True
+  , isException (isBottom (unsafePerformIO $ exitWith ExitSuccess))
+  , isException (isBottom (1 `div` 0))
+  , isException (nonBottomError "...")
   ]
