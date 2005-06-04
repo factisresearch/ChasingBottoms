@@ -21,11 +21,19 @@ import Debug.QuickCheck
 import Test.QuickCheck
 #endif
 import Data.Ratio ((%))
+import Data.Typeable
 
 default ()
 
 -- | Natural numbers.
-newtype Nat = Nat { nat2int :: Integer } deriving (Eq, Ord)
+--
+-- No 'Data.Generics.Basics.Data' instance is provided since the
+-- implementation should be abstract.
+
+-- Could add 'Data.Generics.Basics.Data' instance based on unary
+-- representation of natural numbers, but that would lead to
+-- inefficiencies.
+newtype Nat = Nat { nat2int :: Integer } deriving (Eq, Ord, Typeable)
 
 -- | @'isSucc' 0 == 'False'@, for other total natural numbers it is 'True'.
 isSucc :: Nat -> Bool

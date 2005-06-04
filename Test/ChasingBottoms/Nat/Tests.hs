@@ -1,6 +1,8 @@
 {-# OPTIONS -fglasgow-exts -cpp #-}
 
--- | Tests of the functions in "Test.ChasingBottoms.Nat".
+-- | Tests for "Test.ChasingBottoms.Nat".
+
+-- The automatically derived 'Typeable' instance is not tested.
 
 module Test.ChasingBottoms.Nat.Tests (tests) where
 
