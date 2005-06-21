@@ -1,4 +1,4 @@
-{-# OPTIONS -cpp #-}
+{-# OPTIONS -cpp -fglasgow-exts #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.Nat
