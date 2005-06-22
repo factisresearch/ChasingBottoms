@@ -17,6 +17,10 @@ GHC_DOC_PATH ?= /usr/ed-pkg/wild/ghc-6.4/share/ghc-6.4/html/libraries
 # Store documentation in this directory, after emptying it.
 DOCDIR = docs
 
+# Paths to GHC 6.4 and 6.2.2, used to run the tests.
+GHC_64 ?= _ghc_6.4
+GHC_622 ?= _ghc_6.2.2
+
 ########################################################################
 
 EXPOSED_SOURCES = ChasingBottoms.hs ChasingBottoms/Approx.hs	\
@@ -61,3 +65,13 @@ $(DOCDIR) : $(addprefix Test/,$(EXPOSED_SOURCES:=$(CPPHS_PROCESSED_SUFFIX))) \
 dist: $(DOCDIR)
 	-rm $(addprefix Test/,$(EXPOSED_SOURCES:=$(CPPHS_PROCESSED_SUFFIX)))
 	-rm $(FILES_TO_BE_EXCLUDED)
+
+# Runs all tests using both GHC 6.2.2 and GHC 6.4.
+compile = $(1) -ignore-dot-ghci -no-recomp --make $(2)
+testWithCompiler = $(call compile,$(1),Test.ChasingBottoms) && $(call	\
+compile,$(1),Test.ChasingBottoms.Tests -main-is				\
+Test.ChasingBottoms.Tests.main -o tests) && ./tests
+.PHONY : test
+test:
+	$(call testWithCompiler,$(GHC_64) -hide-package ChasingBottoms)
+	$(call testWithCompiler,$(GHC_622))

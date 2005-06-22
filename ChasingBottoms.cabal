@@ -22,5 +22,5 @@ exposed-modules: Test.ChasingBottoms, Test.ChasingBottoms.Approx,
 other-modules: Test.ChasingBottoms.IsType
 -- It would be nice if the tests that can be accessed through
 -- Test.ChasingBottoms.Tests.main could be run automatically using
--- Cabal.
+-- Cabal. See make test.
 ghc-options: -O2
