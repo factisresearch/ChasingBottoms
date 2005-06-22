@@ -121,7 +121,7 @@ appPrec        = 10
 minPrec        = 0
 -- Some infix constructors seem to have parentheses around them in
 -- their conString representations. Maybe something should be done about
--- that. See the Q test case below, and compare with ordinary lists.
+-- that. See the Q test case, and compare with ordinary lists.
 showCon a      = showString $ showConstr' a
   where
   showConstr' a
