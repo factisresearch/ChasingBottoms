@@ -3,9 +3,8 @@
 -- | Tests for "Test.ChasingBottoms.SemanticOrd". The functions using
 -- implicit arguments are currently not tested.
 
--- This module contains _many_ generators. It is probably not too hard
--- to implement them in a generic way. Then it would also be
--- worthwhile exporting them.
+-- This module contains _many_ generators. It may be worthwhile
+-- exporting some of them.
 
 module Test.ChasingBottoms.SemanticOrd.Tests (tests) where
 
