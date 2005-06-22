@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
+{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.ApproxShow
@@ -123,6 +123,11 @@ minPrec        = 0
 -- their conString representations. Maybe something should be done about
 -- that. See the Q test case below, and compare with ordinary lists.
 showCon a      = showString $ showConstr' a
+  where
+  showConstr' a
+    | dataTypeRep (dataTypeOf a) == dataTypeRep (dataTypeOf 'c') = 
+        "'" ++ showConstr (toConstr a) ++ "'"
+    | otherwise = showConstr $ toConstr a
 isAtom a       = glength a == 0
 isPrimitive a  = not $ isAlgType (dataTypeOf a)
 isInfix a      = if isPrimitive a then
@@ -131,21 +136,3 @@ isInfix a      = if isPrimitive a then
                    constrFixity (toConstr a) == Infix
 wrap s         = \s' -> s . s' . s
 when' b s      = if b then (s .) else (id .)
-
-------------------------------------------------------------------------
--- Compatibility functions
-
-#if __GLASGOW_HASKELL__ <= 602
-
-showConstr' a = conString $ toConstr a
-isAlgType d = maxConIndex d > 0
-constrFixity = conFixity
-
-#else
-
-showConstr' a
-  | dataTypeRep (dataTypeOf a) == dataTypeRep (dataTypeOf 'c') = 
-      "'" ++ showConstr (toConstr a) ++ "'"
-  | otherwise = showConstr $ toConstr a
-
-#endif

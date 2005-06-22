@@ -1,4 +1,4 @@
-{-# OPTIONS -cpp -fglasgow-exts #-}
+{-# OPTIONS -fglasgow-exts #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.Nat
@@ -15,11 +15,7 @@
 
 module Test.ChasingBottoms.Nat(Nat, isSucc, fromSucc, natrec, foldN) where
 
-#if __GLASGOW_HASKELL__ <= 602
-import Debug.QuickCheck
-#else
 import Test.QuickCheck
-#endif
 import Data.Ratio ((%))
 import Data.Typeable
 

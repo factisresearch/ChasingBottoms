@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -cpp #-}
+{-# OPTIONS -fglasgow-exts #-}
 
 -- | Tests for "Test.ChasingBottoms.SemanticOrd". The functions using
 -- implicit arguments are currently not tested.
@@ -12,13 +12,8 @@ module Test.ChasingBottoms.SemanticOrd.Tests (tests) where
 import Test.ChasingBottoms.IsBottom
 import Test.ChasingBottoms.SemanticOrd
 import Test.ChasingBottoms.TestUtilities
-#if __GLASGOW_HASKELL__ <= 602
-import Debug.QuickCheck
-import Debug.QuickCheck.Batch (run)
-#else
 import Test.QuickCheck
 import Test.QuickCheck.Batch (run)
-#endif
 import Data.Generics
 import Control.Monad
 import Data.Maybe

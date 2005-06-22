@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
+{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.Approx
@@ -102,24 +102,5 @@ approxGen' n
                            childTerm
      in gmapT fun x
 
-#if __GLASGOW_HASKELL__ <= 602
-
-instance Eq DataType where
-  d1 == d2 = dataTypeCons d1 =|= dataTypeCons d2
-
--- (=|=) implements equality on unordered lists. It is comparable in
--- efficiency to (==) if the two lists are equal as lists.
-(=|=) :: Eq a => [a] -> [a] -> Bool
-xs =|= ys = case xs of
-  [] ->    null ys
-  x:xs' -> if x `elem` ys then
-             xs' =|= List.delete x ys
-            else
-             False
-
-#else
-
 instance Eq DataType where
   d1 == d2 = dataTypeRep d1 == dataTypeRep d2
-
-#endif

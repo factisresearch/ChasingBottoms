@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -cpp #-}
+{-# OPTIONS -fglasgow-exts #-}
 
 -- | Tests for "Test.ChasingBottoms.Nat".
 
@@ -9,13 +9,8 @@ module Test.ChasingBottoms.Nat.Tests (tests) where
 import Test.ChasingBottoms.Nat
 import Test.ChasingBottoms.SemanticOrd
 import Test.ChasingBottoms.TestUtilities
-#if __GLASGOW_HASKELL__ <= 602
-import Debug.QuickCheck
-import Debug.QuickCheck.Batch
-#else
 import Test.QuickCheck
 import Test.QuickCheck.Batch
-#endif
 import Data.Maybe
 import Data.List
 import Data.Ratio

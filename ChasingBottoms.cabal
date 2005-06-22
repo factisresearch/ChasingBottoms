@@ -1,5 +1,5 @@
 name: ChasingBottoms
-version: 1.0.0
+version: 1.1.0
 license: OtherLicense
 license-file: LICENCE
 copyright: Copyright (c) Nils Anders Danielsson 2004, 2005.
@@ -13,7 +13,7 @@ description: Do you ever feel the need to test code involving bottoms
   (e.g. calls to the error function), or code involving infinite values?
   Then this library could be useful for you.
 category: Test
-tested-with: GHC==6.2.2, GHC==6.4
+tested-with: GHC==6.4
 build-depends: base==1.0, QuickCheck==1.0
 exposed-modules: Test.ChasingBottoms, Test.ChasingBottoms.Approx,
   Test.ChasingBottoms.ApproxShow, Test.ChasingBottoms.IsBottom,

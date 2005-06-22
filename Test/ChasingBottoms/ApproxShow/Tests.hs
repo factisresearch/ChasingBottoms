@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -cpp #-}
+{-# OPTIONS -fglasgow-exts #-}
 
 -- | Tests of the functions in "Test.ChasingBottoms.ApproxShow".
 

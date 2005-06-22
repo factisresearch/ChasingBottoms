@@ -1,5 +1,3 @@
-{-# OPTIONS -cpp #-}
-
 -- | Some utilities that are part of the testing framework.
 
 module Test.ChasingBottoms.TestUtilities
@@ -25,13 +23,8 @@ module Test.ChasingBottoms.TestUtilities
   , pair3
   ) where
 
-#if __GLASGOW_HASKELL__ <= 602
-import Debug.QuickCheck
-import Debug.QuickCheck.Batch
-#else
 import Test.QuickCheck
 import Test.QuickCheck.Batch
-#endif
 import Data.List
 import Control.Arrow
 import Control.Monad

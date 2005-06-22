@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances -cpp #-}
+{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.SemanticOrd
@@ -265,17 +265,3 @@ a \/?? (b :: b) =
 --     (False, False) -> -- We know that we are not dealing with functions.
 --                       a ==! b
 --     _              -> False
-
-------------------------------------------------------------------------
--- Compatibility functions
-
-#if __GLASGOW_HASKELL__ <= 602
-
-gzipWithT :: GenericQ GenericT -> GenericQ GenericT
-gzipWithT = tmapT
-gzipWithM :: Monad m => GenericQ (GenericM m) -> GenericQ (GenericM m)
-gzipWithM = tmapM
-gzipWithQ :: GenericQ (GenericQ r) -> GenericQ (GenericQ [r])
-gzipWithQ q = tmapQl (++) [] (\x y -> [q x y])
-
-#endif

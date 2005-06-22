@@ -1,4 +1,4 @@
-{-# OPTIONS -cpp #-}
+{-# OPTIONS #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.IsType
@@ -41,14 +41,3 @@ isString x = isList x && typeRepArgs (typeOf x) == typeRepArgs (typeOf "")
 
 isList :: Typeable a => a -> Bool
 isList x = con x == con ""
-
-------------------------------------------------------------------------
--- Compatibility functions
-
-#if __GLASGOW_HASKELL__ <= 602
-
-typeRepTyCon = typerepTyCon
-tyConString = tyconString
-typeRepArgs = typerepArgs
-
-#endif
