@@ -4,13 +4,14 @@
 
 module Test.ChasingBottoms.Tests (main) where
 
-import qualified Test.ChasingBottoms.Approx.Tests      as Approx
-import qualified Test.ChasingBottoms.ApproxShow.Tests  as ApproxShow
-import qualified Test.ChasingBottoms.IsBottom.Tests    as IsBottom
-import qualified Test.ChasingBottoms.IsType.Tests      as IsType
-import qualified Test.ChasingBottoms.Nat.Tests         as Nat
-import qualified Test.ChasingBottoms.SemanticOrd.Tests as SemanticOrd
-import qualified Test.ChasingBottoms.TimeOut.Tests     as TimeOut
+import qualified Test.ChasingBottoms.Approx.Tests              as Approx
+import qualified Test.ChasingBottoms.ApproxShow.Tests          as ApproxShow
+import qualified Test.ChasingBottoms.IsBottom.Tests            as IsBottom
+import qualified Test.ChasingBottoms.IsType.Tests              as IsType
+import qualified Test.ChasingBottoms.Nat.Tests                 as Nat
+import qualified Test.ChasingBottoms.SemanticOrd.Tests         as SemanticOrd
+import qualified Test.ChasingBottoms.TestUtilities.Generators  as Generators
+import qualified Test.ChasingBottoms.TimeOut.Tests             as TimeOut
 
 -- | A class for things that can be tested.
 class Test a where
@@ -60,11 +61,12 @@ main = do
    else
     putStrLn "At least one test failed."
   return ok
-  where theTests = [ test "Approx:"      Approx.tests
-                   , test "ApproxShow:"  ApproxShow.tests
-                   , test "IsBottom:"    IsBottom.tests
-                   , test "IsType:"      IsType.tests
-                   , test "Nat:"         Nat.tests
-                   , test "SemanticOrd:" SemanticOrd.tests
-                   , test "TimeOut:"     TimeOut.tests
+  where theTests = [ test "Approx:"              Approx.tests
+                   , test "ApproxShow:"          ApproxShow.tests
+                   , test "Generators:"          Generators.tests
+                   , test "IsBottom:"            IsBottom.tests
+                   , test "IsType:"              IsType.tests
+                   , test "Nat:"                 Nat.tests
+                   , test "SemanticOrd:"         SemanticOrd.tests
+                   , test "TimeOut:"             TimeOut.tests
                    ]

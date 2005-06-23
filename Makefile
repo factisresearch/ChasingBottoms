@@ -32,6 +32,7 @@ ChasingBottoms/Approx/Tests.hs ChasingBottoms/ApproxShow/Tests.hs	\
 ChasingBottoms/IsBottom/Tests.hs ChasingBottoms/IsType/Tests.hs		\
 ChasingBottoms/Nat/Tests.hs ChasingBottoms/SemanticOrd/Tests.hs		\
 ChasingBottoms/TimeOut/Tests.hs ChasingBottoms/TestUtilities.hs		\
+ChasingBottoms/TestUtilities/Generators.hs				\
 ChasingBottoms/TestLibraryWhenCompiling.hs
 
 # GHC packages whose documentation we want to hyperlink to.
