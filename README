@@ -8,6 +8,10 @@ To build: Use Cabal, or use ghc --make Test.ChasingBottoms. (If
 Test.ChasingBottoms is already installed you may need to add something
 like -ignore-package ChasingBottoms.)
 
+ChasingBottoms depends on Ralf Hinze and Ross Paterson's sequences
+(see http://www.soi.city.ac.uk/~ross/papers/FingerTree.html). That
+library can also be installed using Cabal.
+
 Do not use Cabal to build the documentation. Use make docs instead.
 You may need to edit the Makefile first.
 
@@ -20,11 +24,7 @@ Possible future work
   easier using the new version of Scrap your boilerplate, Scrap your
   boilerplate with class.)
 
-* Generic generators for partial and infinite values, including
-  partial, continuous functions. (It is relatively easy to generate
-  partial functions that are, in general, not monotone. Monotone and
-  continuous functions correspond better to typical Haskell functions,
-  though.)
+* More custom generators for partial and infinite values.
 
 Known bugs
 ----------

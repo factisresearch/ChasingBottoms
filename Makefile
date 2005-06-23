@@ -22,13 +22,14 @@ GHC_64 ?= _ghc_6.4
 
 ########################################################################
 
-EXPOSED_SOURCES = ChasingBottoms.hs ChasingBottoms/Approx.hs	\
-ChasingBottoms/ApproxShow.hs ChasingBottoms/IsBottom.hs		\
-ChasingBottoms/Nat.hs ChasingBottoms/SemanticOrd.hs		\
-ChasingBottoms/TimeOut.hs
+EXPOSED_SOURCES = ChasingBottoms.hs ChasingBottoms/Approx.hs		\
+ChasingBottoms/ApproxShow.hs ChasingBottoms/ContinuousFunctions.hs	\
+ChasingBottoms/IsBottom.hs ChasingBottoms/Nat.hs			\
+ChasingBottoms/SemanticOrd.hs ChasingBottoms/TimeOut.hs
 
 HIDDEN_SOURCES = ChasingBottoms/IsType.hs ChasingBottoms/Tests.hs	\
 ChasingBottoms/Approx/Tests.hs ChasingBottoms/ApproxShow/Tests.hs	\
+ChasingBottoms/ContinuousFunctions/Tests.hs				\
 ChasingBottoms/IsBottom/Tests.hs ChasingBottoms/IsType/Tests.hs		\
 ChasingBottoms/Nat/Tests.hs ChasingBottoms/SemanticOrd/Tests.hs		\
 ChasingBottoms/TimeOut/Tests.hs ChasingBottoms/TestUtilities.hs		\

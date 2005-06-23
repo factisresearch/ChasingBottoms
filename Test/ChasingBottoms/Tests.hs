@@ -6,6 +6,7 @@ module Test.ChasingBottoms.Tests (main) where
 
 import qualified Test.ChasingBottoms.Approx.Tests              as Approx
 import qualified Test.ChasingBottoms.ApproxShow.Tests          as ApproxShow
+import qualified Test.ChasingBottoms.ContinuousFunctions.Tests as ContinuousFunctions
 import qualified Test.ChasingBottoms.IsBottom.Tests            as IsBottom
 import qualified Test.ChasingBottoms.IsType.Tests              as IsType
 import qualified Test.ChasingBottoms.Nat.Tests                 as Nat
@@ -63,6 +64,7 @@ main = do
   return ok
   where theTests = [ test "Approx:"              Approx.tests
                    , test "ApproxShow:"          ApproxShow.tests
+                   , test "ContinuousFunctions:" ContinuousFunctions.tests
                    , test "Generators:"          Generators.tests
                    , test "IsBottom:"            IsBottom.tests
                    , test "IsType:"              IsType.tests
