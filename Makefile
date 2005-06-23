@@ -43,7 +43,7 @@ FILES_TO_BE_EXCLUDED = .boring
 $(DOCDIR) : $(addprefix Test/,$(EXPOSED_SOURCES)) Header
 	-rm -rf $(DOCDIR)
 	mkdir -p $(DOCDIR)
-	$(HADDOCK) -h --title="Chasing Bottoms" --prologue=Header -odocs \
+	$(HADDOCK) -h --title="Chasing Bottoms" --prologue=Header -o$(DOCDIR) \
 	  $(foreach pkg,$(PACKAGES),\
              -i$(GHC_DOC_URL)/$(pkg),$(GHC_DOC_PATH)/$(pkg)/$(pkg).haddock) \
 	  $(filter Test/%,$^)
