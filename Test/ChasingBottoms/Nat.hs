@@ -7,7 +7,7 @@
 -- 
 -- Maintainer  :  http://www.cs.chalmers.se/~nad/
 -- Stability   :  experimental
--- Portability :  portable
+-- Portability :  non-portable (GHC-specific)
 --
 -- A simple implementation of natural numbers on top of 'Integer's.
 -- Note that since 'Integer's are used there is no infinite natural
