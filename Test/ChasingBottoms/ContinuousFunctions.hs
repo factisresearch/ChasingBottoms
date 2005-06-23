@@ -158,8 +158,7 @@ data PatternMatch
 
 type GenTransformer = forall a. Gen a -> Gen a
 
--- | It is fairly easy to implement a function satisfying the 'MakePM'
--- signature. See 'match'.
+-- | The type of a 'PatternMatch' generator.
 
 type MakePM a = a -> PatternMatch
 
@@ -357,7 +356,7 @@ matchTree match t = PatternMatch { apply = toVariant t, more = moreT t }
   moreT (Branch l r) = fromList [matchTree match l, matchTree match r]
   moreT (Leaf x)     = singleton (match x)
 
--- | Generic instantiation of the 'MakePM' signature.
+-- | Generic implementation of 'PatternMatch' construction.
 
 match :: forall a. Data a => MakePM a
 match x = PatternMatch
