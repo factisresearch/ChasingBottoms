@@ -1,6 +1,5 @@
 {-# OPTIONS -fglasgow-exts #-}
 
--- TODO: Rename function'.
 -- TODO: Can we pattern match on functions?
 -- What about functions of several arguments? Can we have interleaved
 -- pattern matching? Do we need to use currying to achieve this? What
@@ -77,7 +76,7 @@
 --     'Arbitrary' instance. However, for each constructor generated a
 --     subset of the transformations from step 1 are applied. This
 --     transformation application is wrapped up in the function
---     'function''.
+--     'transform'.
 --
 -- The net result of this is that some pattern matches are performed
 -- later, or not at all, so functions can be lazy.
@@ -92,18 +91,19 @@
 -- > finiteTreeOf :: MakeResult a -> MakeResult (Tree a)
 -- > finiteTreeOf makeResult = sized . tree
 -- >     where
--- >     tree pms size
+-- >     tree pms size = transform (tree' size) pms
+-- >     tree' size pms
 -- >       | size == 0 = baseCase
 -- >       | otherwise = frequency [(1, baseCase), (1, liftM2 Branch tree' tree')]
 -- >       where
--- >       tree' = function' pms (flip tree (size `div` 2))
+-- >       tree' = tree pms (size `div` 2)
 -- > 
 -- >       baseCase =
 -- >         frequency [ (1, return bottom)
--- >                   , (2, liftM Leaf (function' pms makeResult))
+-- >                   , (2, liftM Leaf (makeResult pms))
 -- >                   ]
 --
--- Note the use of 'function''. To use this function to generate
+-- Note the use of 'transform'. To use this function to generate
 -- functions of type @Bool -> Tree Integer@ we can use
 --
 -- > forAll (functionTo (finiteTreeOf flat)) $
@@ -119,7 +119,7 @@ module Test.ChasingBottoms.ContinuousFunctions
   , PatternMatches  -- Note: Abstract.
   , MakePM
   , MakeResult
-  , function'
+  , transform
     -- * Generic @MakePM@
   , match
     -- * Some @MakeResult@s
@@ -163,18 +163,22 @@ type GenTransformer = forall a. Gen a -> Gen a
 
 type MakePM a = a -> PatternMatch
 
--- | A @'MakeResult' a@ should be implemented as other generators for
--- the type @a@, with the following difference: Recursive calls to
--- generators (typically for each new constructor) should be made via
--- 'function'', which takes the 'PatternMatches' and a 'MakeResult' as
--- parameters and modifies the generated result.
+-- | A @'MakeResult' a@ should be implemented almost as other generators for
+-- the type @a@, with the difference that 'transform' should be
+-- used wherever the resulting function should be allowed to pattern
+-- match (typically for each constructor emitted). See example above.
+--
+-- The 'PatternMatches' are currently passed around manually. A reader
+-- monad could be wrapped around the 'Gen' monad, but that will not be
+-- convenient unless some framework is built up to support the use of
+-- the new monad.
 
 type MakeResult a = PatternMatches -> Gen a
 
 -- | This is just a sequence of 'PatternMatch'es, but it is kept
 -- abstract since implementations of the 'MakeResult' signature do not
 -- need to, and should not, do anything with a value of type
--- 'PatternMatches' except for passing it along to 'function''.
+-- 'PatternMatches' except for passing it along to 'transform'.
 
 newtype PatternMatches = PMs { unPMs :: Seq PatternMatch }
 
@@ -193,16 +197,15 @@ functionTo = function match
 
 function :: MakePM a -> MakeResult b -> Gen (a -> b)
 function makePM makeResult =
-   promote $ \a ->
-     function' (PMs $ singleton $ makePM a) makeResult
+   promote $ \a -> makeResult (PMs $ singleton $ makePM a)
 
--- | 'function'' makes sure that the pattern matches get to influence
+-- | 'transform' makes sure that the pattern matches get to influence
 -- the generated value. See 'MakeResult'.
 
-function' :: PatternMatches -> MakeResult a -> Gen a
-function' pms makeResult = do
-  (GenT transform, keep) <- getMatches (unPMs pms)
-  transform (makeResult (PMs keep))
+transform :: MakeResult a -> MakeResult a
+transform makeResult pms = do
+  (GenT trans, keep) <- getMatches (unPMs pms)
+  trans (makeResult (PMs keep))
 
 newtype GenTransformer' = GenT GenTransformer
 
@@ -254,7 +257,7 @@ compose = Seq.foldr (.) id
 -- of the time.
 
 flat :: Arbitrary a => MakeResult a
-flat _ =
+flat = transform $ \_ ->
   frequency [ (1, return bottom)
             , (9, arbitrary)
             ]
@@ -264,12 +267,13 @@ flat _ =
 finiteListOf :: MakeResult a -> MakeResult [a]
 finiteListOf makeResult = sized . list
     where
-    list pms size
+    list pms size = transform (list' size) pms
+    list' size pms
       | size == 0 = baseCase
       | otherwise =
           frequency [ (1, baseCase)
-                    , (9, liftM2 (:) (function' pms makeResult)
-                                     (function' pms (flip list (size - 1)))
+                    , (9, liftM2 (:) (makeResult pms)
+                                     (list pms (size - 1))
                       )
                     ]
       where
@@ -282,16 +286,18 @@ finiteListOf makeResult = sized . list
 -- | This 'MakeResult' yields infinite partial lists.
 
 infiniteListOf :: MakeResult a -> MakeResult [a]
-infiniteListOf makeResult = \pms ->
-  liftM2 (:) (function' pms makeResult)
-             (function' pms (infiniteListOf makeResult))
+infiniteListOf makeResult = transform $ \pms ->
+  liftM2 (:) (makeResult pms)
+             (infiniteListOf makeResult pms)
 
 -- | This 'MakeResult' yields finite or infinite partial lists.
 
 listOf :: MakeResult a -> MakeResult [a]
-listOf makeResult = \pms -> oneof [ finiteListOf makeResult pms
-                                  , infiniteListOf makeResult pms
-                                  ]
+                    -- Not really necessary to have a transform here...
+listOf makeResult = transform $ \pms ->
+   oneof [ finiteListOf makeResult pms
+         , infiniteListOf makeResult pms
+         ]
 
 ------------------------------------------------------------------------
 -- Failed attempt at a generic implementation of MakeResult
@@ -305,27 +311,29 @@ listOf makeResult = \pms -> oneof [ finiteListOf makeResult pms
 -- function.
 
 makeResult :: forall a. Data a => MakeResult a
-makeResult pms = frequency $ (1, return bottom) : others
+makeResult = transform res
   where
-  others = case dataTypeRep (dataTypeOf (undefined :: a)) of
-             AlgRep constrs ->
-               map (handle (L.genericLength constrs)) constrs
-             IntRep         -> [(9, cast' (arbitrary :: Gen Integer))]
-             FloatRep       -> [(9, cast' (arbitrary :: Gen Double))]
-             StringRep      -> nonBottomError "makeResult: StringRep."
-             NoRep          -> nonBottomError "makeResult: NoRep."
+  res pms = frequency $ (1, return bottom) : others
+    where
+    others = case dataTypeRep (dataTypeOf (undefined :: a)) of
+               AlgRep constrs ->
+                 map (handle (L.genericLength constrs)) constrs
+               IntRep         -> [(9, cast' (arbitrary :: Gen Integer))]
+               FloatRep       -> [(9, cast' (arbitrary :: Gen Double))]
+               StringRep      -> nonBottomError "makeResult: StringRep."
+               NoRep          -> nonBottomError "makeResult: NoRep."
 
-  handle noConstrs con =
-    (freq, fromConstrM (function' pms makeResult) con :: Gen a)
-    where noArgs = glength (fromConstr con :: a)
-          -- Aim for at most 10% bottoms (on average).
-          freq = 1 `max` ceiling (9 / noConstrs)
+    handle noConstrs con =
+      (freq, fromConstrM (makeResult pms) con :: Gen a)
+      where noArgs = glength (fromConstr con :: a)
+            -- Aim for at most 10% bottoms (on average).
+            freq = 1 `max` ceiling (9 / noConstrs)
 
-  cast' gen = flip fmap gen $ \x -> case cast x of
-    Just x' -> x'
-    Nothing -> nonBottomError $
-                 "makeResult: Cannot handle Int and Float." ++
-                 " Use Integer or Double instead."
+    cast' gen = flip fmap gen $ \x -> case cast x of
+      Just x' -> x'
+      Nothing -> nonBottomError $
+                   "makeResult: Cannot handle Int and Float." ++
+                   " Use Integer or Double instead."
 
 ------------------------------------------------------------------------
 -- Generic MakePM

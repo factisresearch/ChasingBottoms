@@ -25,15 +25,16 @@ import Data.Ratio
 finiteTreeOf :: MakeResult a -> MakeResult (Tree a)
 finiteTreeOf makeResult = sized . tree
     where
-    tree pms size
+    tree pms size = transform (tree' size) pms
+    tree' size pms
       | size == 0 = baseCase
       | otherwise = frequency [(1, baseCase), (1, liftM2 Branch tree' tree')]
       where
-      tree' = function' pms (flip tree (size `div` 2))
+      tree' = tree pms (size `div` 2)
 
       baseCase =
         frequency [ (1, return bottom)
-                  , (2, liftM Leaf (function' pms makeResult))
+                  , (2, liftM Leaf (makeResult pms))
                   ]
 
 ------------------------------------------------------------------------
