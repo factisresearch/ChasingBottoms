@@ -41,7 +41,7 @@ ChasingBottoms/TestUtilities/Generators.hs				\
 ChasingBottoms/TestLibraryWhenCompiling.hs
 
 # GHC packages whose documentation we want to hyperlink to.
-PACKAGES = base QuickCheck
+PACKAGES = base mtl QuickCheck
 
 FILES_TO_BE_EXCLUDED = .boring
 

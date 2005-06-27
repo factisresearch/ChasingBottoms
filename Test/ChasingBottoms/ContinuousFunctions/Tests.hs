@@ -23,19 +23,22 @@ import Data.Ratio
 -- Example data type
 
 finiteTreeOf :: MakeResult a -> MakeResult (Tree a)
-finiteTreeOf makeResult = sized . tree
+finiteTreeOf makeResult = sized' tree
+  where
+  tree size = transform $
+    if size == 0 then
+      baseCase
+     else
+      frequency' [ (1, baseCase)
+                 , (1, liftM2 Branch tree' tree')
+                 ]
     where
-    tree pms size = transform (tree' size) pms
-    tree' size pms
-      | size == 0 = baseCase
-      | otherwise = frequency [(1, baseCase), (1, liftM2 Branch tree' tree')]
-      where
-      tree' = tree pms (size `div` 2)
+    tree' = tree (size `div` 2)
 
-      baseCase =
-        frequency [ (1, return bottom)
-                  , (2, liftM Leaf (makeResult pms))
-                  ]
+    baseCase =
+      frequency' [ (1, return bottom)
+                 , (2, liftM Leaf makeResult)
+                 ]
 
 ------------------------------------------------------------------------
 -- Helpers
