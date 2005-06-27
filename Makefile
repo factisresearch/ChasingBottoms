@@ -1,4 +1,5 @@
-# This Makefile is currently only used to build the documentation.
+# This Makefile is currently only used to build the documentation and
+# to run a test suite automatically using darcs.
 
 ########################################################################
 # You may need to edit the following variables:
@@ -11,10 +12,13 @@ HADDOCK ?= haddock-0.6
 GHC_DOC_URL ?= http://www.haskell.org/ghc/docs/latest/html/libraries
 
 # Path prefix leading to Haddock interface files for the hierarchical
-# libraries.
+# libraries. These files should be compiled using a Haddock program
+# which is interface compatible with the one listed above (same
+# version).
 GHC_DOC_PATH ?= /usr/ed-pkg/wild/ghc-6.4/share/ghc-6.4/html/libraries
 
-# Store documentation in this directory, after emptying it.
+# Documentation is stored in this directory. Note that the directory
+# is emptied first.
 DOCDIR = docs
 
 # Path to GHC 6.4, used to run the tests.
