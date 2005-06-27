@@ -51,10 +51,11 @@
 --
 -- Sometimes using possibly non-monotone functions is good enough,
 -- since that set of functions is a superset of the continuous
--- functions. However, say that we want to test that @x '<=!' y@
--- implies that @f x '<=!' f y@ for all functions @f@ (whenever the
--- latter expression returns a total result). This property is not
--- valid in the presence of non-monotone functions.
+-- functions. However, say that we want to test that @x
+-- 'Test.ChasingBottoms.SemanticOrd.<=!' y@ implies that @f x
+-- 'Test.ChasingBottoms.SemanticOrd.<=!' f y@ for all functions @f@
+-- (whenever the latter expression returns a total result). This
+-- property is not valid in the presence of non-monotone functions.
 --
 -- By avoiding 'isBottom' and, unlike the standard 'coarbitrary'
 -- functions, deferring some pattern matches, we can generate
