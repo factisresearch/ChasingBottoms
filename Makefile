@@ -45,7 +45,8 @@ PACKAGES = base QuickCheck
 
 FILES_TO_BE_EXCLUDED = .boring
 
-$(DOCDIR) : $(addprefix Test/,$(EXPOSED_SOURCES)) Header
+$(DOCDIR) : $(DOCDIR)/index.html
+$(DOCDIR)/index.html : $(addprefix Test/,$(EXPOSED_SOURCES)) Header
 	-rm -rf $(DOCDIR)
 	mkdir -p $(DOCDIR)
 	$(HADDOCK) -h --title="Chasing Bottoms" --prologue=Header -o$(DOCDIR) \
