@@ -22,7 +22,7 @@ GHC_DOC_PATH ?= /chalmers/sw/unsup/ghc-6.4.1/share/ghc-6.4.1/html/libraries
 DOCDIR = docs
 
 # Path to GHC 6.4, used to run the tests.
-GHC_64 ?= _ghc_6.4
+GHC_64 ?= _ghc_6.4.1
 
 ########################################################################
 
