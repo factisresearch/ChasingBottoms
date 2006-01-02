@@ -5,7 +5,7 @@
 # You may need to edit the following variables:
 
 # Path to Haddock.
-HADDOCK ?= haddock-0.6
+HADDOCK ?= haddock
 
 # URL prefix leading to Haddock documentation for the hierarchical
 # libraries.
@@ -15,7 +15,7 @@ GHC_DOC_URL ?= http://www.haskell.org/ghc/docs/latest/html/libraries
 # libraries. These files should be compiled using a Haddock program
 # which is interface compatible with the one listed above (same
 # version).
-GHC_DOC_PATH ?= /usr/ed-pkg/wild/ghc-6.4/share/ghc-6.4/html/libraries
+GHC_DOC_PATH ?= /chalmers/sw/unsup/ghc-6.4.1/share/ghc-6.4.1/html/libraries
 
 # Documentation is stored in this directory. Note that the directory
 # is emptied first.
