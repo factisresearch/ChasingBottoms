@@ -1,5 +1,3 @@
-{-# OPTIONS #-}
-
 -- |
 -- Module      :  Test.ChasingBottoms.IsType
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
