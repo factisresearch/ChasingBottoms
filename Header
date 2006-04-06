@@ -87,7 +87,7 @@ QuickCheck, see the article \"Chasing Bottoms, A Case Study in Program
 Verification in the Presence of Partial and Infinite Values\"
 (<http://www.cs.chalmers.se/~nad/publications/danielsson-jansson-mpc2004.html>).
 
-The code is developed and tested under GHC 6.4. Most parts can
+The code is developed and tested under GHC 6.2 and 6.4. Most parts can
 probably be ported to other Haskell compilers, but that would require
 some work. The @TimeOut@ functions require preemptive scheduling, and
 most of the rest requires @Data.Generics@; @isBottom@ only requires
