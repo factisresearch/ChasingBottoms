@@ -18,28 +18,14 @@
 -- limitations. Note that non-bottom functions are not handled by any
 -- of the functions described below.
 --
--- Some functions take the implicit parameters @?approxDepth@ and
--- @?timeOutLimit@. They have the following meaning:
---
--- [@?approxDepth@] If equal to @'Just' n@, an @'approxAll' n@ is
--- performed on all arguments before doing whatever the function is
--- supposed to be doing.
---
--- [@?timeOutLimit@] If equal to @'Just' n@, then all computations
--- that take more than @n@ seconds to complete are considered to be
--- equal to 'bottom'. This functionality is implemented using
--- 'isBottomTimeOut'.
---
--- Note that the use of implicit parameters here is more experimental
--- than the rest of the library, and hence more likely to be removed
--- in future versions.
---
 -- One could imagine using QuickCheck for testing equality of
 -- functions, but I have not managed to tweak the type system so that
 -- it can be done transparently.
 
 module Test.ChasingBottoms.SemanticOrd
-  ( SemanticEq(..)
+  ( Tweak(..)
+  , noTweak
+  , SemanticEq(..)
   , SemanticOrd(..)
   ) where
 
@@ -51,9 +37,31 @@ import Test.ChasingBottoms.Nat
 import Test.ChasingBottoms.Approx
 
 infix 4 <!, <=!, ==!, >=!, >!, /=!
-infix 4 <?, <=?, ==?, >=?, >?, /=?
-infix 5 \/!, \/?
-infixl 5 /\!, /\?
+infix 5 \/!
+infixl 5 /\!
+
+-- | The behaviour of some of the functions below can be tweaked.
+
+data Tweak = Tweak
+  { approxDepth :: Maybe Nat
+    -- ^ If equal to @'Just' n@, an @'approxAll' n@ is performed on
+    -- all arguments before doing whatever the function is supposed to
+    -- be doing.
+  , timeOutLimit :: Maybe Int
+    -- ^ If equal to @'Just' n@, then all computations that take more
+    -- than @n@ seconds to complete are considered to be equal to
+    -- 'bottom'. This functionality is implemented using
+    -- 'isBottomTimeOut'.
+  }
+  deriving (Eq, Ord, Show)
+
+-- | No tweak (both fields are 'Nothing').
+
+noTweak :: Tweak
+noTweak = Tweak
+  { approxDepth  = Nothing
+  , timeOutLimit = Nothing
+  }
 
 -- | 'SemanticEq' contains methods for testing whether two terms are
 -- semantically equal.
@@ -65,42 +73,26 @@ infixl 5 /\!, /\?
 
 class SemanticEq a where
   (==!), (/=!) :: a -> a -> Bool
-  (==?), (/=?) :: ( ?approxDepth :: Maybe Nat
-                  , ?timeOutLimit :: Maybe Int
-                  ) => a -> a -> Bool
-
-  (/=?) = \x y -> not (x ==? y)
+  semanticEq :: Tweak -> a -> a -> Bool
 
   (/=!) = \x y -> not (x ==! y)
-
-  (==!) = bindImpl (==?)
+  (==!) = semanticEq noTweak
 
 -- | 'SemanticOrd' contains methods for testing whether two terms are
 -- related according to the semantic domain ordering.
 
 class SemanticEq a => SemanticOrd a where
   (<!), (<=!), (>=!), (>!) :: a -> a -> Bool
-  (<?), (<=?), (>=?), (>?) ::
-    ( ?approxDepth :: Maybe Nat
-    , ?timeOutLimit :: Maybe Int
-    ) => a -> a -> Bool
 
-  semanticCompare :: a -> a -> Maybe Ordering
-  semanticCompare' :: ( ?approxDepth :: Maybe Nat
-                      , ?timeOutLimit :: Maybe Int
-                      ) => a -> a -> Maybe Ordering
-  -- ^ @'semanticCompare' x y@ returns 'Nothing' if @x@ and @y@ are
+  semanticCompare :: Tweak -> a -> a -> Maybe Ordering
+  -- ^ @'semanticCompare' tweak x y@ returns 'Nothing' if @x@ and @y@ are
   -- incomparable, and @'Just' o@ otherwise, where @o :: 'Ordering'@
   -- represents the relation between @x@ and @y@.
 
   (\/!) :: a -> a -> Maybe a
   (/\!) :: a -> a -> a
-  (\/?) :: ( ?approxDepth :: Maybe Nat
-           , ?timeOutLimit :: Maybe Int
-           ) => a -> a -> Maybe a
-  (/\?) :: ( ?approxDepth :: Maybe Nat
-           , ?timeOutLimit :: Maybe Int
-           ) => a -> a -> a
+  semanticJoin :: Tweak -> a -> a -> Maybe a
+  semanticMeet :: Tweak -> a -> a -> a
   -- ^ @x '\/!' y@ and @x '/\!' y@ compute the least upper and greatest
   -- lower bounds, respectively, of @x@ and @y@ in the semantical
   -- domain ordering. Note that the least upper bound may not always
@@ -113,61 +105,52 @@ class SemanticEq a => SemanticOrd a where
   (<!)  = \x y -> x <=! y && x /=! y
   (>!)  = \x y -> x >=! y && x /=! y
 
-  (>=?) = flip (<=?)
-  (<?)  = \x y -> x <=? y && x /=? y
-  (>?)  = \x y -> x >=? y && x /=? y
-
-  (<=!) = bindImpl (<=?)
-
-  semanticCompare = bindImpl semanticCompare'
-
-  semanticCompare' x y | x <?  y   = Just LT
-                       | x ==? y   = Just EQ
-                       | x >?  y   = Just Prelude.GT
-                       | otherwise = Nothing
-
-  x <=? y = case semanticCompare' x y of
+  x <=! y = case semanticCompare noTweak x y of
     Just LT -> True
     Just EQ -> True
     _       -> False
 
-  (\/!) = bindImpl (\/?)
-
-  (/\!) = bindImpl (/\?)
+  (\/!) = semanticJoin noTweak
+  (/\!) = semanticMeet noTweak
 
 instance Data a => SemanticEq a where
-  (==?) = liftAppr (==??)
+  semanticEq tweak = liftAppr tweak semanticEq'
 
 instance Data a => SemanticOrd a where
-  (<=?) = liftAppr (<=??)
-  (/\?)  = liftAppr (/\??)
-  (\/?)  = liftAppr (\/??)
+  semanticCompare tweak = liftAppr tweak semanticCompare'
+    where
+    semanticCompare' tweak x y =
+      case ( semanticEq' tweak x y
+           , semanticLE' tweak x y
+           , semanticLE' tweak y x ) of
+        (True,  _,    _)    -> Just EQ
+        (_,     True, _)    -> Just LT
+        (_,     _,    True) -> Just Prelude.GT
+        (_,     _,    _)    -> Nothing
+  semanticJoin tweak    = liftAppr tweak semanticJoin'
+  semanticMeet tweak    = liftAppr tweak semanticMeet'
 
-liftAppr op x y = appr x `op` appr y
-  where appr = maybe id approxAll ?approxDepth
-
--- Non-trivial type...
-
-bindImpl ::
-  (forall . (?approxDepth :: Maybe Nat, ?timeOutLimit :: Maybe Int) => a) -> a
-bindImpl f = let ?approxDepth = Nothing
-                 ?timeOutLimit = Nothing
-             in f
+liftAppr :: (Data a, Data b) => Tweak -> (Tweak -> a -> a -> b) -> a -> a -> b
+liftAppr tweak op x y = op tweak (appr x) (appr y)
+  where appr = maybe id approxAll (approxDepth tweak)
 
 ------------------------------------------------------------------------
 
-type Rel = (?timeOutLimit :: Maybe Int, Data a, Data b) => a -> b -> Bool
+type Rel' = (Data a, Data b) => Tweak -> a -> b -> Bool
+type Rel  = (Data a, Data b) => a -> b -> Bool
 
-(==??), (<=??) :: Rel
+semanticEq', semanticLE' :: Rel'
 
-a ==?? b = case (isBottomTimeOut a, isBottomTimeOut b) of
+semanticEq' tweak a b = case ( isBottomTimeOut (timeOutLimit tweak) a
+                             , isBottomTimeOut (timeOutLimit tweak) b ) of
   (True, True)   -> True
-  (False, False) -> allOK (==??) a b
+  (False, False) -> allOK (semanticEq' tweak) a b
   _              -> False
 
-a <=?? b = case (isBottomTimeOut a, isBottomTimeOut b) of
+semanticLE' tweak a b = case ( isBottomTimeOut (timeOutLimit tweak) a
+                             , isBottomTimeOut (timeOutLimit tweak) b ) of
   (True, _)      -> True
-  (False, False) -> allOK (<=??) a b
+  (False, False) -> allOK (semanticLE' tweak) a b
   _              -> False
 
 allOK :: Rel -> Rel
@@ -193,20 +176,22 @@ childrenOK op = foldr (&&) True .|.. gzipWithQ op
 
 ------------------------------------------------------------------------
 
-(/\??) :: (?timeOutLimit :: Maybe Int, Data a, Data b) => a -> b -> b
-a /\?? (b :: b) =
-  if isBottomTimeOut a || isBottomTimeOut b then
+semanticMeet' :: (Data a, Data b) => Tweak -> a -> b -> b
+semanticMeet' tweak a (b :: b) =
+  if isBottomTimeOut (timeOutLimit tweak) a ||
+     isBottomTimeOut (timeOutLimit tweak) b then
     bottom
    else if isFunction a || isFunction b then
     error "/\\! does not handle non-bottom functions."
    else if not (a =^= b) then
     bottom
    else
-    gzipWithT (/\??) a b
+    gzipWithT (semanticMeet' tweak) a b
     
-(\/??) :: (?timeOutLimit :: Maybe Int, Data a, Data b) => a -> b -> Maybe b
-a \/?? (b :: b) =
-  case (isBottomTimeOut a, isBottomTimeOut b) of
+semanticJoin' :: (Data a, Data b) => Tweak -> a -> b -> Maybe b
+semanticJoin' tweak a (b :: b) =
+  case ( isBottomTimeOut (timeOutLimit tweak) a
+       , isBottomTimeOut (timeOutLimit tweak) b ) of
     (True,  True)  -> Just bottom
     (True,  False) -> Just b
     (False, True)  -> cast a
@@ -214,7 +199,7 @@ a \/?? (b :: b) =
       | isFunction a || isFunction b ->
           error "\\/! does not handle non-bottom functions."
       | not (a =^= b)                -> Nothing
-      | otherwise                    -> gzipWithM (\/??) a b
+      | otherwise                    -> gzipWithM (semanticJoin' tweak) a b
 
 ------------------------------------------------------------------------
 

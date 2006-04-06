@@ -1,5 +1,3 @@
-{-# OPTIONS -fimplicit-params #-}
-
 -- |
 -- Module      :  Test.ChasingBottoms.IsBottom
 -- Copyright   :  (c) Nils Anders Danielsson 2004, 2005
@@ -7,7 +5,7 @@
 -- 
 -- Maintainer  :  http://www.cs.chalmers.se/~nad/
 -- Stability   :  experimental
--- Portability :  non-portable (exceptions, implicit parameters)
+-- Portability :  non-portable (exceptions)
 --
 
 module Test.ChasingBottoms.IsBottom
@@ -50,7 +48,7 @@ import qualified Test.ChasingBottoms.TimeOut as T
 --   catch (evaluate undefined) (\e -> return ())  ==> return ()
 
 isBottom :: a -> Bool
-isBottom = let ?timeOutLimit = Nothing in isBottomTimeOut
+isBottom = isBottomTimeOut Nothing
 
 -- | 'bottom' generates a bottom that is suitable for testing using
 -- 'isBottom'.
@@ -63,18 +61,18 @@ bottom = error "_|_"
 nonBottomError :: String -> a
 nonBottomError = throw . AssertionFailed
 
--- | 'isBottomTimeOut' works like 'isBottom', but if @?timeOutLimit@
--- is @'Just' lim@, then computations taking more than @lim@ seconds are
--- also considered to be equal to bottom. Note that this is a very
--- crude approximation of what a bottom is. Also note that this
--- \"function\" may return different answers upon different
+-- | @'isBottomTimeOut' timeOutLimit@ works like 'isBottom', but if
+-- @timeOutLimit@ is @'Just' lim@, then computations taking more than
+-- @lim@ seconds are also considered to be equal to bottom. Note that
+-- this is a very crude approximation of what a bottom is. Also note
+-- that this \"function\" may return different answers upon different
 -- invocations. Take it for what it is worth.
 --
 -- 'isBottomTimeOut' is subject to all the same scheduling vagaries as
 -- 'Test.ChasingBottoms.TimeOut.timeOut'.
 
-isBottomTimeOut :: (?timeOutLimit :: Maybe Int) => a -> Bool
-isBottomTimeOut f = unsafePerformIO $
+isBottomTimeOut :: Maybe Int -> a -> Bool
+isBottomTimeOut timeOutLimit f = unsafePerformIO $
   maybeTimeOut (evaluate f) `catch` \e -> case e of
     ArithException _   -> throw e
     ArrayException _   -> return True
@@ -93,7 +91,7 @@ isBottomTimeOut f = unsafePerformIO $
     RecSelError _      -> return True
     RecUpdError _      -> return True
   where
-  maybeTimeOut io = case ?timeOutLimit of
+  maybeTimeOut io = case timeOutLimit of
     Nothing -> do
       io
       return False

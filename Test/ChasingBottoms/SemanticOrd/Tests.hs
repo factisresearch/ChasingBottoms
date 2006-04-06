@@ -1,7 +1,7 @@
 {-# OPTIONS -fglasgow-exts #-}
 
 -- | Tests for "Test.ChasingBottoms.SemanticOrd". The functions using
--- implicit arguments are currently not tested.
+-- tweaks are currently not tested.
 
 module Test.ChasingBottoms.SemanticOrd.Tests (tests) where
 
@@ -45,7 +45,7 @@ prop_SemanticOrd_partial_order element notEqualTo greaterThan joinable =
 
   compare =
     forAll twoElems $ \(x, y) ->
-      case semanticCompare x y of
+      case semanticCompare noTweak x y of
         Nothing         -> not (x <=! y) && not (x >=! y)
         Just LT         -> x <! y
         Just EQ         -> x ==! y
