@@ -1,5 +1,8 @@
 {-# OPTIONS -fglasgow-exts #-}
 
+-- TODO: Tests passed even though for finiteTreeOf and finiteListOf
+-- transform was only applied once at the top-level!
+
 -- | Tests for "Test.ChasingBottoms.ContinuousFunctions". So far the
 -- tests are rather weak.
 
