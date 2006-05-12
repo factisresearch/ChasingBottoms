@@ -13,6 +13,7 @@ import qualified Test.ChasingBottoms.Nat.Tests                 as Nat
 import qualified Test.ChasingBottoms.SemanticOrd.Tests         as SemanticOrd
 import qualified Test.ChasingBottoms.TestUtilities.Generators  as Generators
 import qualified Test.ChasingBottoms.TimeOut.Tests             as TimeOut
+import System.Exit
 
 -- | A class for things that can be tested.
 class Test a where
@@ -53,15 +54,15 @@ instance Test (IO Bool) where
 -- | This function runs all the tests, and returns 'True' if all of
 -- them succeeded.
 
-main :: IO Bool
+main :: IO ()
 main = do
   ok <- fmap and $ sequence theTests
   putStrLn ""
   if ok then
     putStrLn "All tests succeeded."
-   else
+   else do
     putStrLn "At least one test failed."
-  return ok
+    exitFailure
   where theTests = [ test "Approx:"              Approx.tests
                    , test "ApproxShow:"          ApproxShow.tests
                    , test "ContinuousFunctions:" ContinuousFunctions.tests
