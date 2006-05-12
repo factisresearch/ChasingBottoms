@@ -74,10 +74,12 @@ depth (Branch l r)   = 1 + (depth l `max` depth r)
 
 testDistribution test t = do
   result <- run t testOptions
-  return $ apply test result
+  let (ok, msg) = apply test result
+  unless ok $ putStrLn msg
+  return ok
   where
   apply test (TestOk _ n args) = test n args
-  apply _    _                 = False
+  apply _    _                 = (False, "Test failed.")
 
   testOptions = TestOptions { no_of_tests     = 1000
                             , length_of_tests = 0      -- No time limit.
@@ -85,15 +87,22 @@ testDistribution test t = do
                             }
 
 
-spread n args = noUniqueArgs % n >= 3%4
+spread n args = (uniqueShare >= 3%4, "uniqueShare: " ++ show uniqueShare)
   where noUniqueArgs = length . group . sort $ args
+        uniqueShare = noUniqueArgs % n
 
-len n args = maxLen >= 20 && averageLen >= 6 && noShortLists % noArgs >= 1%10
+len max avg short n args =
+  ( maxLen >= max && averageLen >= avg && shortShare >= 1%10
+  , "maxLen: " ++ show maxLen ++
+    ", averageLen: " ++ show averageLen ++
+    ", shortShare: " ++ show shortShare
+  )
   where maxLen = maximum lengths
         averageLen = sum lengths % noArgs
-        noShortLists = genericLength (filter (<= 5) lengths)
+        noShortLists = genericLength (filter (<= short) lengths)
         lengths = map read . concat $ args :: [Integer]
         noArgs = toInteger n
+        shortShare = noShortLists % noArgs
 
 -- | We want to make sure that we can generate many different kinds of
 -- lazy functions.
@@ -107,7 +116,7 @@ prop_many_functions_rather_lazy = testDistribution spread $
 
 -- | The generated lists should not be too short.
 
-prop_lists_have_decent_length = testDistribution len $
+prop_lists_have_decent_length = testDistribution (len 20 6 5) $
   forAll (functionTo (finiteListOf flat)) $ \(f :: Integer -> [Bool]) ->
   forAll integer $ \(i :: Integer) ->
     collect (length' (f i) :: Integer) $
@@ -115,7 +124,7 @@ prop_lists_have_decent_length = testDistribution len $
 
 -- | The generated trees should not be too shallow.
 
-prop_trees_have_decent_depth = testDistribution len $
+prop_trees_have_decent_depth = testDistribution (len 6 2 2) $
   forAll (functionTo (finiteTreeOf flat)) $ \(f :: Integer -> Tree Bool) ->
   forAll integer $ \(i :: Integer) ->
     collect (depth (f i) :: Integer) $
