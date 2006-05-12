@@ -159,8 +159,9 @@ allOK op a b =
   -- above, but why complicate things?
   if isFunction a || isFunction b then
     -- cast' a `fop` cast' b
-    error "The generic versions of (==!) and friends do not accept non-bottom \
-          \functions."
+    nonBottomError
+      "The generic versions of (==!) and friends do not accept non-bottom \
+      \functions."
    else
     a =^= b && childrenOK op a b
 
@@ -182,7 +183,7 @@ semanticMeet' tweak a (b :: b) =
      isBottomTimeOut (timeOutLimit tweak) b then
     bottom
    else if isFunction a || isFunction b then
-    error "/\\! does not handle non-bottom functions."
+    nonBottomError "/\\! does not handle non-bottom functions."
    else if not (a =^= b) then
     bottom
    else
@@ -197,7 +198,7 @@ semanticJoin' tweak a (b :: b) =
     (False, True)  -> cast a
     (False, False)
       | isFunction a || isFunction b ->
-          error "\\/! does not handle non-bottom functions."
+          nonBottomError "\\/! does not handle non-bottom functions."
       | not (a =^= b)                -> Nothing
       | otherwise                    -> gzipWithM (semanticJoin' tweak) a b
 
