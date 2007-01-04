@@ -172,7 +172,7 @@ a =^= b = toConstr a == toConstr b
 
 -- Check children.
 childrenOK :: Rel -> Rel
-childrenOK op = foldr (&&) True .|.. gzipWithQ op
+childrenOK op = foldr (&&) True .|.. gzipWithQ (\x y -> op x y)
   where f .|.. g = \x y -> f (g x y)
 
 ------------------------------------------------------------------------
@@ -187,7 +187,7 @@ semanticMeet' tweak a (b :: b) =
    else if not (a =^= b) then
     bottom
    else
-    gzipWithT (semanticMeet' tweak) a b
+    gzipWithT (\x y -> semanticMeet' tweak x y) a b
     
 semanticJoin' :: (Data a, Data b) => Tweak -> a -> b -> Maybe b
 semanticJoin' tweak a (b :: b) =
@@ -199,8 +199,8 @@ semanticJoin' tweak a (b :: b) =
     (False, False)
       | isFunction a || isFunction b ->
           nonBottomError "\\/! does not handle non-bottom functions."
-      | not (a =^= b)                -> Nothing
-      | otherwise                    -> gzipWithM (semanticJoin' tweak) a b
+      | not (a =^= b) -> Nothing
+      | otherwise     -> gzipWithM (\x y -> semanticJoin' tweak x y) a b
 
 ------------------------------------------------------------------------
 

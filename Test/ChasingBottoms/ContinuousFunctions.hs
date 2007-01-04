@@ -143,6 +143,7 @@ module Test.ChasingBottoms.ContinuousFunctions
 
 import Test.QuickCheck
 import Data.Sequence as Seq
+import Data.Foldable as Seq (foldr)
 import Prelude as P hiding (concat)
 import Test.ChasingBottoms.IsBottom
 import Control.Monad
