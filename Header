@@ -80,8 +80,6 @@ Timeouts can also be applied to @IO@ computations:
 
   [@ @] @Value ()@
 
-TODO: Add example involving generated functions.
-
 All the type annotations above are required.
 
 For the underlying theory and a larger example involving use of

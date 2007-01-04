@@ -18,6 +18,12 @@
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-specific)
 --
+-- Note: /This module is unfinished and experimental. However, I do
+-- not think that I will ever finish it, so I have released it in its
+-- current state. The documentation below may not be completely
+-- correct. The source code lists some things which should be
+-- addressed./
+--
 -- A framework for generating possibly non-strict, partial,
 -- continuous functions.
 -- 
