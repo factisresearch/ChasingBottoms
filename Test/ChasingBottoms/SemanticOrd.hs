@@ -172,7 +172,7 @@ a =^= b = toConstr a == toConstr b
 
 -- Check children.
 childrenOK :: Rel -> Rel
-childrenOK op = foldr (&&) True .|.. gzipWithQ (\x y -> op x y)
+childrenOK op = and .|.. gzipWithQ (\x y -> op x y)
   where f .|.. g = \x y -> f (g x y)
 
 ------------------------------------------------------------------------
