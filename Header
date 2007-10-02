@@ -27,9 +27,9 @@ Comparing finite, partial values:
 
 Showing partial and infinite values (@\\\/!@ is join and @\/\\!@ is meet):
 
-  [@> approxShow 4 $ (True, bottom) \\\/! (bottom, 'b')@] @\"Just (True, 'b')\"@
+  [@> approxShow 4 $ (True, bottom) \\\/! (bottom, \'b\')@] @\"Just (True, \'b\')\"@
 
-  [@> approxShow 4 $ (True, bottom) \/\\! (bottom, 'b')@] @\"(_|_, _|_)\"@
+  [@> approxShow 4 $ (True, bottom) \/\\! (bottom, \'b\')@] @\"(_|_, _|_)\"@
 
   [@> approxShow 4 $ ([1..\] :: [Int\])@] @\"[1, 2, 3, _\"@
 
