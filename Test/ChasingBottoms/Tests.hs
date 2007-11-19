@@ -51,8 +51,8 @@ instance Test (IO Bool) where
     indent b
     return b
 
--- | This function runs all the tests, and returns 'True' if all of
--- them succeeded.
+-- | This function runs all the tests, and prints out a message
+-- indicating whether any failures were encountered.
 
 main :: IO ()
 main = do
