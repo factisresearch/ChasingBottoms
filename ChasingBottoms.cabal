@@ -9,13 +9,12 @@ stability:          experimental
 homepage:           http://www.cs.chalmers.se/~nad/software/#Chasing Bottoms
 package-url:        http://www.cs.chalmers.se/~nad/software/ChasingBottoms/ChasingBottoms.tgz
 synopsis:           For testing partial and infinite values.
-description:        .
-    Do you ever feel the need to test code involving bottoms
-    (e.g. calls to the error function), or code involving infinite values?
-    Then this library could be useful for you.
+description:        Do you ever feel the need to test code involving bottoms (e.g. calls
+                    to the error function), or code involving infinite values? Then this
+                    library could be useful for you.
 category:           Test
-tested-with:        GHC==6.6
-cabal-version:      >= 1.2
+tested-with:        GHC == 6.8.1
+cabal-version:      >= 1.2 && < 2
 
 flag small_base
     description: Choose the new smaller, split-up base package.
@@ -33,13 +32,15 @@ library
 
     other-modules: Test.ChasingBottoms.IsType
 
-    build-depends: QuickCheck, mtl
+    build-depends: QuickCheck >= 1.1 && < 2,
+                   mtl >= 1.1 && < 2
     if flag(small_base)
-        build-depends: base >= 3, containers, random
+        build-depends: base >= 3 && < 4,
+                       containers >= 0.1 && < 1,
+                       random >= 1 && < 2
     else
-        build-depends: base < 3
+        build-depends: base >= 2 && < 3
 
 -- It would be nice if the tests that can be accessed through
 -- Test.ChasingBottoms.Tests.main could be run automatically using
--- Cabal. See make test.
-    ghc-options: -O2
+-- Cabal (in a simple way). See make test.

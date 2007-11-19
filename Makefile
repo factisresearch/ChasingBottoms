@@ -15,14 +15,18 @@ GHC_DOC_URL ?= http://www.haskell.org/ghc/docs/latest/html/libraries
 # libraries. These files should be compiled using a Haddock program
 # which is interface compatible with the one listed above (same
 # version).
-GHC_DOC_PATH ?= /chalmers/sw/unsup/ghc-6.6/share/ghc-6.6/html/libraries
+GHC_DOC_PATH ?= /chalmers/sw/unsup/ghc-6.8.1/share/doc/ghc/libraries
 
 # Documentation is stored in this directory. Note that the directory
 # is emptied first.
 DOCDIR = docs
 
-# Path to GHC 6.6, used to run the tests.
-GHC_66 ?= _ghc_6.6
+# Path to GHC 6.8, used to run the tests.
+GHC_68 ?= _ghc_6.8.1
+
+# GHC packages necessary for building and testing the library.
+PACKAGES = base-3.0.0.0 containers-0.1.0.0 random-1.0.0.0 mtl-1.1.0.0	\
+QuickCheck-1.1.0.0 array-0.1.0.0
 
 ########################################################################
 
@@ -40,9 +44,6 @@ ChasingBottoms/TimeOut/Tests.hs ChasingBottoms/TestUtilities.hs		\
 ChasingBottoms/TestUtilities/Generators.hs				\
 ChasingBottoms/TestLibraryWhenCompiling.hs
 
-# GHC packages whose documentation we want to hyperlink to.
-PACKAGES = base mtl QuickCheck
-
 FILES_TO_BE_EXCLUDED = .boring
 
 $(DOCDIR) : $(DOCDIR)/index.html
@@ -51,7 +52,7 @@ $(DOCDIR)/index.html : $(addprefix Test/,$(EXPOSED_SOURCES)) Header
 	mkdir -p $(DOCDIR)
 	$(HADDOCK) -h --title="Chasing Bottoms" --prologue=Header -o$(DOCDIR) \
 	  $(foreach pkg,$(PACKAGES),\
-             -i$(GHC_DOC_URL)/$(pkg),$(GHC_DOC_PATH)/$(pkg)/$(pkg).haddock) \
+             -i$(GHC_DOC_URL)/$(pkg),$(GHC_DOC_PATH)/$(pkg)/`echo $(pkg) | sed -r -e 's/-.*//'`.haddock) \
 	  $(filter Test/%,$^)
 
 # Target used by darcs dist.
@@ -61,11 +62,12 @@ $(DOCDIR)/index.html : $(addprefix Test/,$(EXPOSED_SOURCES)) Header
 dist: $(DOCDIR)
 	-rm $(FILES_TO_BE_EXCLUDED)
 
-# Runs all tests using GHC 6.6.
-compile = $(1) -ignore-dot-ghci -no-recomp --make $(2)
+# Runs all tests using GHC 6.8.
+compile = $(1) -ignore-dot-ghci -no-recomp -hide-all-packages \
+	  $(foreach pkg,$(PACKAGES),-package $(pkg)) --make $(2)
 testWithCompiler = $(call compile,$(1),Test.ChasingBottoms) && $(call	\
 compile,$(1),Test.ChasingBottoms.Tests -main-is				\
 Test.ChasingBottoms.Tests.main -o tests) && ./tests
 .PHONY : test
 test:
-	$(call testWithCompiler,$(GHC_66))
+	$(call testWithCompiler,$(GHC_68))
