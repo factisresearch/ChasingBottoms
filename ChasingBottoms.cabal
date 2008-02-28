@@ -4,10 +4,10 @@ license:            OtherLicense
 license-file:       LICENCE
 copyright:          Copyright (c) Nils Anders Danielsson 2004-2008.
 author:             Nils Anders Danielsson
-maintainer:         http://www.cs.chalmers.se/~nad/contact.html
+maintainer:         http://www.cs.nott.ac.uk/~nad/contact.html
 stability:          experimental
-homepage:           http://www.cs.chalmers.se/~nad/software/#Chasing Bottoms
-package-url:        http://www.cs.chalmers.se/~nad/software/ChasingBottoms/ChasingBottoms.tgz
+homepage:           http://www.cs.nott.ac.uk/~nad/software/#Chasing Bottoms
+package-url:        http://www.cs.nott.ac.uk/~nad/software/ChasingBottoms/ChasingBottoms.tgz
 synopsis:           For testing partial and infinite values.
 description:        Do you ever feel the need to test code involving bottoms (e.g. calls
                     to the error function), or code involving infinite values? Then this

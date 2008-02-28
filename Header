@@ -85,7 +85,7 @@ All the type annotations above are required.
 For the underlying theory and a larger example involving use of
 QuickCheck, see the article \"Chasing Bottoms, A Case Study in Program
 Verification in the Presence of Partial and Infinite Values\"
-(<http://www.cs.chalmers.se/~nad/publications/danielsson-jansson-mpc2004.html>).
+(<http://www.cs.nott.ac.uk/~nad/publications/danielsson-jansson-mpc2004.html>).
 
 The code has been tested under GHC 6.8. Most parts can probably be
 ported to other Haskell compilers, but that would require some work.
@@ -93,4 +93,4 @@ The @TimeOut@ functions require preemptive scheduling, and most of the
 rest requires @Data.Generics@; @isBottom@ only requires exceptions,
 though.
 
-Source code: <http://www.cs.chalmers.se/~nad/software/ChasingBottoms/ChasingBottoms.tar.gz>.
+Source code: <http://www.cs.nott.ac.uk/~nad/software/ChasingBottoms/ChasingBottoms.tar.gz>.
