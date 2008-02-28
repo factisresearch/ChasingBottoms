@@ -15,20 +15,26 @@ GHC_DOC_URL ?= http://www.haskell.org/ghc/docs/latest/html/libraries
 # libraries. These files should be compiled using a Haddock program
 # which is interface compatible with the one listed above (same
 # version).
-GHC_DOC_PATH ?= /chalmers/sw/unsup/ghc-6.8.1/share/doc/ghc/libraries
+GHC_DOC_PATH ?= /usr/local/share/doc/ghc/libraries/
 
 # Documentation is stored in this directory. Note that the directory
 # is emptied first.
 DOCDIR = docs
 
 # Path to GHC 6.8, used to run the tests.
-GHC_68 ?= _ghc_6.8.1
+GHC_68 ?= ghc
 
 # GHC packages necessary for building and testing the library.
-PACKAGES = base-3.0.0.0 containers-0.1.0.0 random-1.0.0.0 mtl-1.1.0.0	\
+PACKAGES = base-3.0.1.0 containers-0.1.0.1 random-1.0.0.0 mtl-1.1.0.0	\
 QuickCheck-1.1.0.0 array-0.1.0.0
 
 ########################################################################
+
+# PKGS is PACKAGES but without the numeric suffices. Unfortunately
+#   PKGS=$(foreach pkg,$(PACKAGES),`echo $(pkg) | sed -r -e 's/-.*//'`)
+# does not quite work, so I have resorted to the following ugly hack:
+
+PKGS=$(basename $(basename $(basename $(basename $(subst -,.,$(PACKAGES))))))
 
 EXPOSED_SOURCES = ChasingBottoms.hs ChasingBottoms/Approx.hs		\
 ChasingBottoms/ApproxShow.hs ChasingBottoms/ContinuousFunctions.hs	\
@@ -51,8 +57,8 @@ $(DOCDIR)/index.html : $(addprefix Test/,$(EXPOSED_SOURCES)) Header
 	-rm -rf $(DOCDIR)
 	mkdir -p $(DOCDIR)
 	$(HADDOCK) -h --title="Chasing Bottoms" --prologue=Header -o$(DOCDIR) \
-	  $(foreach pkg,$(PACKAGES),\
-             -i$(GHC_DOC_URL)/$(pkg),$(GHC_DOC_PATH)/$(pkg)/`echo $(pkg) | sed -r -e 's/-.*//'`.haddock) \
+	  $(foreach pkg,$(PKGS),\
+             -i$(GHC_DOC_URL)/$(pkg),$(GHC_DOC_PATH)/$(pkg)/$(pkg).haddock) \
 	  $(filter Test/%,$^)
 
 # Target used by darcs dist.
