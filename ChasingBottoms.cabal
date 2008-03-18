@@ -15,6 +15,7 @@ description:        Do you ever feel the need to test code involving bottoms (e.
 category:           Testing
 tested-with:        GHC == 6.8.2
 cabal-version:      >= 1.2 && < 2
+build-type:         Simple
 
 flag small_base
     description: Choose the new smaller, split-up base package.
