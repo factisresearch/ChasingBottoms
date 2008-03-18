@@ -104,8 +104,6 @@ description:
   The @TimeOut@ functions require preemptive scheduling, and most of the
   rest requires @Data.Generics@; @isBottom@ only requires exceptions,
   though.
-  .
-  Source code: <http://www.cs.nott.ac.uk/~nad/software/ChasingBottoms/ChasingBottoms.tar.gz>.
 category:           Testing
 tested-with:        GHC == 6.8.2
 cabal-version:      >= 1.2 && < 2
