@@ -1,9 +1,9 @@
 -- |
 -- Module      :  Test.ChasingBottoms.IsType
--- Copyright   :  (c) Nils Anders Danielsson 2004-2007
+-- Copyright   :  (c) Nils Anders Danielsson 2004-2008
 -- License     :  See the file LICENCE.
 -- 
--- Maintainer  :  http://www.cs.chalmers.se/~nad/
+-- Maintainer  :  http://www.cs.nott.ac.uk/~nad/
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-specific)
 --
