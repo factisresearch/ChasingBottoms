@@ -125,6 +125,32 @@ library
                    random == 1.0.*,
                    syb >= 0.1.0.2 && < 0.2
 
--- It would be nice if the tests that can be accessed through
--- Test.ChasingBottoms.Tests.main could be run automatically using
--- Cabal (in a simple way). See make test.
+flag build-tests
+    description: Build the test suite.
+    default:     False
+    manual:      True
+
+executable ChasingBottomsTestSuite
+    if !flag(build-tests)
+      buildable:   False
+
+    main-is:       Test/ChasingBottoms/Tests.hs
+
+    other-modules: Test.ChasingBottoms.Approx.Tests,
+                   Test.ChasingBottoms.ApproxShow.Tests,
+                   Test.ChasingBottoms.ContinuousFunctions.Tests,
+                   Test.ChasingBottoms.IsBottom.Tests,
+                   Test.ChasingBottoms.IsType.Tests,
+                   Test.ChasingBottoms.Nat.Tests,
+                   Test.ChasingBottoms.SemanticOrd.Tests,
+                   Test.ChasingBottoms.TestUtilities,
+                   Test.ChasingBottoms.TestUtilities.Generators,
+                   Test.ChasingBottoms.TimeOut.Tests
+
+    build-depends: QuickCheck == 2.1.*,
+                   mtl == 1.1.*,
+                   base == 4.*,
+                   containers == 0.3.*,
+                   random == 1.0.*,
+                   syb >= 0.1.0.2 && < 0.2,
+                   array == 0.3.*

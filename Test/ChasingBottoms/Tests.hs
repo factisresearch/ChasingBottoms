@@ -2,7 +2,7 @@
 
 -- | Tests of almost everything related to "Test.ChasingBottoms".
 
-module Test.ChasingBottoms.Tests (main) where
+module Main (main) where
 
 import qualified Test.ChasingBottoms.Approx.Tests              as Approx
 import qualified Test.ChasingBottoms.ApproxShow.Tests          as ApproxShow
