@@ -2,7 +2,7 @@
 
 -- |
 -- Module      :  Test.ChasingBottoms.Nat
--- Copyright   :  (c) Nils Anders Danielsson 2004-2008
+-- Copyright   :  (c) Nils Anders Danielsson 2004-2010
 -- License     :  See the file LICENCE.
 --
 -- Maintainer  :  http://www.cs.nott.ac.uk/~nad/
