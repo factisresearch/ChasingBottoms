@@ -15,6 +15,7 @@ module Test.ChasingBottoms.Approx
   ) where
 
 import Test.ChasingBottoms.Nat
+import Data.Function
 import Data.Generics
 import qualified Data.List as List
 
@@ -96,11 +97,9 @@ approxGen' n
   | otherwise = \x ->
      let d = dataTypeOf x
          n' = pred n
-         fun childTerm = if dataTypeOf childTerm == d then
+         fun childTerm = if dataTypeOf childTerm === d then
                            approxGen' n' childTerm
                           else
                            childTerm
      in gmapT fun x
-
-instance Eq DataType where
-  d1 == d2 = dataTypeRep d1 == dataTypeRep d2
+    where (===) = (==) `on` dataTypeRep
