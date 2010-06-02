@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 
 -- | Tests of the functions in "Test.ChasingBottoms.ApproxShow".
 

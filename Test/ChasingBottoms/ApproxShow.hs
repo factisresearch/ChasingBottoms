@@ -1,4 +1,5 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
+{-# LANGUAGE ScopedTypeVariables,
+             FlexibleInstances, UndecidableInstances #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.ApproxShow
@@ -122,12 +123,7 @@ minPrec        = 0
 -- Some infix constructors seem to have parentheses around them in
 -- their conString representations. Maybe something should be done about
 -- that. See the Q test case, and compare with ordinary lists.
-showCon a      = showString $ showConstr' a
-  where
-  showConstr' a
-    | dataTypeRep (dataTypeOf a) == dataTypeRep (dataTypeOf 'c') = 
-        "'" ++ showConstr (toConstr a) ++ "'"
-    | otherwise = showConstr $ toConstr a
+showCon a      = showString $ showConstr $ toConstr a
 isAtom a       = glength a == 0
 isPrimitive a  = not $ isAlgType (dataTypeOf a)
 isInfix a      = if isPrimitive a then

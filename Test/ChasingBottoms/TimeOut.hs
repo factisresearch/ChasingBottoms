@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.TimeOut
@@ -29,25 +29,32 @@ import Control.Concurrent
 import Data.Dynamic
 import qualified Control.Exception as E
 
+import {-# SOURCE #-} qualified Test.ChasingBottoms.IsBottom as B
+
 data Result a
   = Value a
   | NonTermination
-  | Exception E.Exception
-    deriving (Eq, Show, Typeable)
+  | Exception E.SomeException
+    deriving (Show, Typeable)
 
 -- | @'timeOut' n c@ runs @c@ for at most @n@ seconds (modulo
 -- scheduling issues).
 --
---   * If the computation terminates before that, then
---     @'Value' v@ is returned, where @v@ is the resulting value. Note
---     that this value may be equal to bottom, e.g. if @c = 'return'
---     'Test.ChasingBottoms.IsBottom.bottom'@.
+--   * If the computation terminates before that, then @'Value' v@ is
+--     returned, where @v@ is the resulting value. Note that this
+--     value may be equal to bottom, e.g. if @c = 'return'
+--     'B.bottom'@.
 --
 --   * If the computation does not terminate, then 'NonTermination' is
 --     returned.
 --
 --   * If the computation raises an exception, then @'Exception' e@ is
 --     returned, where @e@ is the exception.
+--
+-- Note that a user-defined exception is used to terminate the
+-- computation, so if @c@ catches all exceptions, or blocks
+-- asynchronous exceptions, then 'timeOut' may fail to function
+-- properly.
 
 timeOut :: Int -> IO a -> IO (Result a)
 timeOut = timeOutMicro . (* 10^6)
@@ -61,12 +68,12 @@ timeOutMicro :: Int -> IO a -> IO (Result a)
 timeOutMicro delay io = do
   mv <- newEmptyMVar
   let putException = putMVar mv . Exception
-  ioThread <- forkIO $ (io >>= putMVar mv . Value)
-                      `E.catch` (\e -> case e of
-                        E.DynException d -> case fromDynamic d of
-                          Just Die -> return ()  -- Thread properly killed.
-                          Nothing -> putException e
-                        _ -> putException e)
+  ioThread <- forkIO $
+    (io >>= putMVar mv . Value)
+    `E.catch` (\(e :: E.SomeException) ->
+                case E.fromException e of
+                  Just Die -> return ()  -- Thread properly killed.
+                  Nothing  -> putException e)
   reaper <- forkIO $ do
     threadDelay delay
     putMVar mv NonTermination
@@ -76,13 +83,15 @@ timeOutMicro delay io = do
   return result
 
 -- Since 'ioThread' above should return exceptions raised in the code
--- we cannot kill the thread using killThread, which raises
--- @'AsyncException' 'ThreadKilled'@. We use the locally defined type
--- 'Die' together with a dynamic exception instead.
+-- it seems like a bad idea to kill the thread using killThread, which
+-- raises @'AsyncException' 'ThreadKilled'@. We use the locally
+-- defined type 'Die' instead.
 
-data Die = Die deriving Typeable
+data Die = Die deriving (Show, Typeable)
 
-killThread' threadId = E.throwDynTo threadId Die
+instance E.Exception Die
+
+killThread' threadId = E.throwTo threadId Die
 
 -- | 'timeOut'' is a variant which can be used for pure
 -- computations. The definition,
@@ -91,12 +100,11 @@ killThread' threadId = E.throwDynTo threadId Die
 --   'timeOut'' n = 'timeOut' n . 'E.evaluate'
 -- @
 --
--- ensures that @'timeOut'' 1 'Test.ChasingBottoms.IsBottom.bottom'@
--- usually returns @'Exception' \<something\>@. (@'timeOut' 1 ('return'
--- 'Test.ChasingBottoms.IsBottom.bottom')@ usually returns @'Value'
--- 'Test.ChasingBottoms.IsBottom.bottom'@; in other words, the
--- computation reaches whnf almost immediately, defeating the purpose
--- of the time-out.)
+-- ensures that @'timeOut'' 1 'B.bottom'@ usually returns @'Exception'
+-- \<something\>@. (@'timeOut' 1 ('return' 'B.bottom')@ usually
+-- returns @'Value' 'B.bottom'@; in other words, the computation
+-- reaches whnf almost immediately, defeating the purpose of the
+-- time-out.)
 
 timeOut' :: Int -> a -> IO (Result a)
 timeOut' n = timeOut n . E.evaluate

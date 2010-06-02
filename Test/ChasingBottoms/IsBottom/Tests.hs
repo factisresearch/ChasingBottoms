@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 -- | Tests of the functions in "Test.ChasingBottoms.IsBottom".
 --
 -- Note that the warnings given when compiling this module are
@@ -12,7 +14,8 @@ import System.Exit
 import qualified Control.Exception as E
 
 isException f = unsafePerformIO $
-  (E.evaluate f >> return False) `E.catch` const (return True)
+  (E.evaluate f >> return False)
+    `E.catch` (\(_ :: E.SomeException) -> return True)
 
 bot = bot
 notbot x = notbot x

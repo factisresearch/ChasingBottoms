@@ -1,4 +1,5 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables,
+             GeneralizedNewtypeDeriving, DeriveDataTypeable #-}
 
 -- TODO: Can we pattern match on functions?
 -- What about functions of several arguments? Can we have interleaved
@@ -18,11 +19,7 @@
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-specific)
 --
--- Note: /This module is unfinished and experimental. However, I do
--- not think that I will ever finish it, so I have released it in its
--- current state. The documentation below may not be completely
--- correct. The source code lists some things which should be
--- addressed./
+-- Note: /This module is unfinished and experimental. However, I do not think that I will ever finish it, so I have released it in its current state. The documentation below may not be completely correct. The source code lists some things which should be addressed./
 --
 -- A framework for generating possibly non-strict, partial,
 -- continuous functions.
@@ -57,11 +54,10 @@
 --
 -- Sometimes using possibly non-monotone functions is good enough,
 -- since that set of functions is a superset of the continuous
--- functions. However, say that we want to test that @x
--- 'Test.ChasingBottoms.SemanticOrd.<=!' y@ implies that @f x
--- 'Test.ChasingBottoms.SemanticOrd.<=!' f y@ for all functions @f@
--- (whenever the latter expression returns a total result). This
--- property is not valid in the presence of non-monotone functions.
+-- functions. However, say that we want to test that @x 'O.<=!' y@
+-- implies that @f x 'O.<=!' f y@ for all functions @f@ (whenever the
+-- latter expression returns a total result). This property is not
+-- valid in the presence of non-monotone functions.
 --
 -- By avoiding 'isBottom' and, unlike the standard 'coarbitrary'
 -- functions, deferring some pattern matches, we can generate
@@ -147,7 +143,7 @@ module Test.ChasingBottoms.ContinuousFunctions
   , listOf
   ) where
 
-import Test.QuickCheck
+import Test.QuickCheck hiding ((><), listOf)
 import Data.Sequence as Seq
 import Data.Foldable as Seq (foldr)
 import Prelude as P hiding (concat)
@@ -158,6 +154,8 @@ import Control.Arrow
 import System.Random
 import Data.Generics
 import qualified Data.List as L
+
+import qualified Test.ChasingBottoms.SemanticOrd as O
 
 ------------------------------------------------------------------------
 -- Generation of functions
@@ -215,7 +213,7 @@ type MakePM a = a -> PatternMatch
 
 -- These functions provided inspiration for the generic one below.
 
-matchFlat :: Arbitrary a => MakePM a
+matchFlat :: CoArbitrary a => MakePM a
 matchFlat a = PatternMatch { apply = coarbitrary a, more = empty }
 
 data Tree a
@@ -240,15 +238,12 @@ match x = PatternMatch
             , more  = more x
             }
   where
-  -- seq added since toConstr is not strict enough for
-  -- one-constructor data types. (Bug reported; should be fixed in the
-  -- CVS repository.)
   toVariant :: forall a b. Data a => a -> Gen b -> Gen b
-  toVariant x = x `seq` case constrRep (toConstr x) of
-    AlgConstr n    -> variant (n - 1)  -- n >= 1.
-    IntConstr i    -> coarbitrary i
-    FloatConstr d  -> coarbitrary d
-    StringConstr s -> nonBottomError "match: Encountered StringConstr."
+  toVariant x = case constrRep (toConstr x) of
+    AlgConstr n   -> variant (n - 1)  -- n >= 1.
+    IntConstr i   -> coarbitrary i
+    FloatConstr d -> coarbitrary d
+    CharConstr s  -> nonBottomError "match: Encountered CharConstr."
 
   more :: forall a. Data a => a -> Seq PatternMatch
   more = gmapQr (<|) empty match
@@ -308,9 +303,9 @@ transform makeResult = withPMs $ \pms -> do
 getMatches :: Seq PatternMatch -> Gen (GenTransformer', Seq PatternMatch)
 getMatches pms = do
   -- Throw away pattern matches with probability 0.1.
-  (_, pms') <- partition 9 pms
+  (_, pms') <- partition' 9 pms
   -- Use pattern matches with probability 0.33.
-  (use, keep) <- partition 2 pms'
+  (use, keep) <- partition' 2 pms'
   let transform = compose $ fmap apply use
       further = concat $ fmap more use
   if Seq.null further then
@@ -336,11 +331,11 @@ compose = Seq.foldr (.) id
 -- the relative probability with which elements end up in the second
 -- part compared to the first one.
 
-partition :: Int -> Seq a -> Gen (Seq a, Seq a)
-partition freq ss = case viewl ss of
+partition' :: Int -> Seq a -> Gen (Seq a, Seq a)
+partition' freq ss = case viewl ss of
   EmptyL  -> return (empty, empty)
   x :< xs -> do
-    (ys, zs) <- partition freq xs
+    (ys, zs) <- partition' freq xs
     frequency [ (1,    return (x <| ys, zs))
               , (freq, return (ys, x <| zs))
               ]
@@ -447,7 +442,7 @@ makeResult = transform (frequency' $ (1, return bottom) : others)
                map (handle (L.genericLength constrs)) constrs
              IntRep         -> [(9, cast' (arbitrary' :: MakeResult Integer))]
              FloatRep       -> [(9, cast' (arbitrary' :: MakeResult Double))]
-             StringRep      -> nonBottomError "makeResult: StringRep."
+             CharRep        -> nonBottomError "makeResult: CharRep."
              NoRep          -> nonBottomError "makeResult: NoRep."
 
   handle noConstrs con =

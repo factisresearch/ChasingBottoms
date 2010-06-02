@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 -- | Tests of almost everything related to "Test.ChasingBottoms".
 

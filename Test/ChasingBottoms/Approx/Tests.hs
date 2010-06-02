@@ -1,4 +1,5 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE ScopedTypeVariables, RankNTypes,
+             DeriveDataTypeable #-}
 
 -- | Tests of the functions in "Test.ChasingBottoms.Approx".
 

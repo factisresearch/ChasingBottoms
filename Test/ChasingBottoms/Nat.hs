@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.Nat
@@ -16,6 +16,7 @@
 module Test.ChasingBottoms.Nat(Nat, isSucc, fromSucc, natrec, foldN) where
 
 import Test.QuickCheck
+import qualified Data.Generics as G
 import Data.Ratio ((%))
 import Data.Typeable
 
@@ -23,12 +24,11 @@ default ()
 
 -- | Natural numbers.
 --
--- No 'Data.Generics.Basics.Data' instance is provided since the
--- implementation should be abstract.
+-- No 'G.Data' instance is provided, because the implementation should
+-- be abstract.
 
--- Could add 'Data.Generics.Basics.Data' instance based on unary
--- representation of natural numbers, but that would lead to
--- inefficiencies.
+-- Could add 'G.Data' instance based on unary representation of
+-- natural numbers, but that would lead to inefficiencies.
 newtype Nat = Nat { nat2int :: Integer } deriving (Eq, Ord, Typeable)
 
 -- | @'isSucc' 0 == 'False'@, for other total natural numbers it is 'True'.
@@ -106,4 +106,9 @@ instance Arbitrary Nat where
   arbitrary = do
     n <- arbitrary :: Gen Integer
     return $ fromInteger $ abs n
+
+  shrink 0 = []
+  shrink n = [n - 1]
+
+instance CoArbitrary Nat where
   coarbitrary n = coarbitrary (toInteger n)

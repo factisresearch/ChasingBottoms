@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable #-}
 
 -- TODO: Tests passed even though for finiteTreeOf and finiteListOf
 -- transform was only applied once at the top-level!
@@ -11,13 +11,14 @@ module Test.ChasingBottoms.ContinuousFunctions.Tests (tests) where
 import Test.ChasingBottoms.ContinuousFunctions
 import Test.ChasingBottoms.IsBottom
 import Test.ChasingBottoms.SemanticOrd
+import Test.ChasingBottoms.TestUtilities
 import qualified Test.ChasingBottoms.TestUtilities.Generators as Gen
 import Test.ChasingBottoms.TestUtilities.Generators (Tree(..))
 import Test.ChasingBottoms.ApproxShow
 import Data.Generics
 import Test.QuickCheck
-import Test.QuickCheck.Batch (run, TestOptions(..), TestResult(..))
 import Test.ChasingBottoms.TestUtilities
+import Control.Arrow
 import Control.Monad
 import Data.List
 import Data.Ratio
@@ -73,36 +74,33 @@ depth (Branch l r)   = 1 + (depth l `max` depth r)
 -- How do we test these properties?
 
 testDistribution test t = do
-  result <- run t testOptions
+  result <- run t
   let (ok, msg) = apply test result
   unless ok $ putStrLn msg
   return ok
   where
-  apply test (TestOk _ n args) = test n args
-  apply _    _                 = (False, "Test failed.")
+  apply test (Success labels) = test labels
+  apply _    _                = (False, "Test failed.")
 
-  testOptions = TestOptions { no_of_tests     = 1000
-                            , length_of_tests = 0      -- No time limit.
-                            , debug_tests     = False
-                            }
+spread labels = (uniqueShare >= 3%4, "uniqueShare: " ++ show uniqueShare)
+  where
+  noUniqueArgs = length labels
+  noArgs       = sum $ map snd labels
+  uniqueShare  = noUniqueArgs % noArgs
 
-
-spread n args = (uniqueShare >= 3%4, "uniqueShare: " ++ show uniqueShare)
-  where noUniqueArgs = length . group . sort $ args
-        uniqueShare = noUniqueArgs % n
-
-len max avg short n args =
+len max avg short labels =
   ( maxLen >= max && averageLen >= avg && shortShare >= 1%10
   , "maxLen: " ++ show maxLen ++
     ", averageLen: " ++ show averageLen ++
     ", shortShare: " ++ show shortShare
   )
-  where maxLen = maximum lengths
-        averageLen = sum lengths % noArgs
-        noShortLists = genericLength (filter (<= short) lengths)
-        lengths = map read . concat $ args :: [Integer]
-        noArgs = toInteger n
-        shortShare = noShortLists % noArgs
+  where
+  lengths      = map (read *** toInteger) labels :: [(Integer, Integer)]
+  noArgs       = sum (map snd lengths)
+  maxLen       = maximum $ map fst lengths
+  averageLen   = sum (map (uncurry (*)) lengths) % noArgs
+  noShortLists = sum . map snd . filter ((<= short) . fst) $ lengths
+  shortShare   = noShortLists % noArgs
 
 -- | We want to make sure that we can generate many different kinds of
 -- lazy functions.
@@ -116,7 +114,7 @@ prop_many_functions_rather_lazy = testDistribution spread $
 
 -- | The generated lists should not be too short.
 
-prop_lists_have_decent_length = testDistribution (len 20 6 5) $
+prop_lists_have_decent_length = testDistribution (len 20 5 5) $
   forAll (functionTo (finiteListOf flat)) $ \(f :: Integer -> [Bool]) ->
   forAll integer $ \(i :: Integer) ->
     collect (length' (f i) :: Integer) $
@@ -200,7 +198,7 @@ tests = do
 -- Manual inspection of function tables
 
 viewFun :: (ApproxShow b, Data a) => MakeResult b -> [a] -> IO ()
-viewFun (makeResult :: MakeResult b) (inputs :: [a]) = test $
+viewFun (makeResult :: MakeResult b) (inputs :: [a]) = quickCheck $
   forAll (functionTo makeResult) $ \(f :: a -> b) ->
     collect (map (approxShow 5 . f) inputs) $ True
 

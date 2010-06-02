@@ -1,4 +1,5 @@
-{-# OPTIONS -fglasgow-exts -fallow-undecidable-instances #-}
+{-# LANGUAGE ScopedTypeVariables, RankNTypes,
+             FlexibleInstances, UndecidableInstances #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.SemanticOrd

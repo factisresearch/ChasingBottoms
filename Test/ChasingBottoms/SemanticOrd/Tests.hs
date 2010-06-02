@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE RankNTypes #-}
 
 -- | Tests for "Test.ChasingBottoms.SemanticOrd". The functions using
 -- tweaks are currently not tested.
@@ -9,7 +9,6 @@ import Test.ChasingBottoms.SemanticOrd
 import Test.ChasingBottoms.TestUtilities
 import Test.ChasingBottoms.TestUtilities.Generators hiding (tests)
 import Test.QuickCheck
-import Test.QuickCheck.Batch (run)
 import Data.Generics
 import Control.Monad
 import Data.Maybe

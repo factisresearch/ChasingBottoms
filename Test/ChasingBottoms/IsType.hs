@@ -16,6 +16,7 @@ module Test.ChasingBottoms.IsType
   , isString
   ) where
 
+import Data.List
 import Data.Typeable
 
 -- | '@isFunction@ f' returns 'True' iff the top level \"constructor\"
@@ -31,8 +32,7 @@ con = typeRepTyCon . typeOf
 -- for debugging purposes anyway. The unit type is not considered to
 -- be a tuple.
 isTuple :: Typeable a => a -> Bool
-isTuple x = if null s then False else head s == ','
-  where s = tyConString (con x)
+isTuple x = "(," `isPrefixOf` tyConString (con x)
 
 isString :: Typeable a => a -> Bool
 isString x = isList x && typeRepArgs (typeOf x) == typeRepArgs (typeOf "")

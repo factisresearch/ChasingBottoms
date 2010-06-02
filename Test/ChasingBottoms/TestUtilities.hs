@@ -2,7 +2,8 @@
 
 module Test.ChasingBottoms.TestUtilities
   ( -- * Batch execution of QuickCheck tests
-    runQuickCheckTests
+    run
+  , runQuickCheckTests
     -- * Various algebraic properties
   , isAssociative
   , isCommutative
@@ -24,7 +25,6 @@ module Test.ChasingBottoms.TestUtilities
   ) where
 
 import Test.QuickCheck
-import Test.QuickCheck.Batch
 import Data.List
 import Control.Arrow
 import Control.Monad
@@ -33,50 +33,38 @@ import Text.Show.Functions
 ------------------------------------------------------------------------
 -- Batch execution of QuickCheck tests
 
+-- | Runs a single test, using suitable settings.
+
+run :: Testable p => p -> IO Result
+run = quickCheckWithResult (stdArgs { maxSuccess = 1000
+                                    , maxDiscard = 5000
+                                    })
+
 -- | Runs a bunch of QuickCheck tests, printing suitable information
 -- to standard output. Returns 'True' if no tests fail. Note that a
 -- test where the inputs are exhausted is considered to have
 -- succeeded.
 
-runQuickCheckTests :: [TestOptions -> IO TestResult]
+runQuickCheckTests :: [IO Result]
                       -- ^ Create the tests in this list from ordinary
                       -- QuickCheck tests by using 'run'.
                       -> IO Bool
 runQuickCheckTests tests = do
-  results <- mapM ($ testOptions) tests
-  mapM_ (putStr . showTR) results
+  results <- sequence tests
+  mapM_ (putStrLn . showTR) results
   return $ all ok $ results
   where
-  ok (TestOk {})       = True
-  ok (TestExausted {}) = True   -- We treat this as OK since the
-                                -- distribution of test data is displayed.
-  ok (TestFailed {})   = False
-  ok (TestAborted {})  = False
+  ok (Success {})           = True
+  ok (GaveUp {})            = False
+  ok (Failure {})           = False
+  ok (NoExpectedFailure {}) = False
 
-  testOptions = TestOptions { no_of_tests     = 1000
-                            , length_of_tests = 0      -- No time limit.
-                            , debug_tests     = False
-                            }
-
-  showTR (TestOk _ n args) =
-    "OK, passed " ++ show n ++ " tests.\n" ++ showArgs args
-  showTR (TestExausted _ n args) =
-    "Arguments exhausted after " ++ show n ++ " tests.\n" ++ showArgs args
-  showTR (TestFailed _ _) = "Test failed.\n"
-  showTR (TestAborted _) = "Test resulted in exception.\n"
-
-  showArgs :: [[String]] -> String
-  showArgs args
-    | all null args = ""
-    | otherwise     =
-        unlines
-        . map (indent . uncurry (++)
-               . (formatNum *** (concat . intersperse ", ")))
-        . sortBy (\x y -> compare (fst y) (fst x))
-        . map (length &&& head) . group . sort
-        $ args
-    where indent = ("  " ++)
-          formatNum = flip shows ": "
+  showTR (Success {})              = "OK."
+  showTR (GaveUp { numTests = n }) =
+    "Gave up after " ++ show n ++ " tests."
+  showTR (Failure {})              = "Test failed."
+  showTR (NoExpectedFailure {})    =
+    "Test did not fail, but it should have."
 
 ------------------------------------------------------------------------
 -- Testing various algebraic properties
@@ -230,19 +218,17 @@ isPartialOrder
 isPartialOrder element equalTo differentFrom greaterThan (==.) (<=.) =
   [reflexive, antisymmetric1, antisymmetric2, transitive]
   where
-  infix 4 ==., <=.
-
   reflexive =
     forAll element $ \x ->
       x <=. x
 
   antisymmetric1 =
     forAll (pair element equalTo) $ \(x, y) ->
-      (x <=. y && y <=. x) && x ==. y
+      ((x <=. y) && (y <=. x)) && x ==. y
 
   antisymmetric2 =
     forAll (pair element differentFrom) $ \(x, y) ->
-      not (x <=. y && y <=. x) && not (x ==. y)
+      not ((x <=. y) && (y <=. x)) && not (x ==. y)
 
   transitive = forAll (pair element greaterThan) $ \(x, y) ->
                  forAll (greaterThan y) $ \z ->
@@ -271,12 +257,10 @@ isTotalOrder element equalTo differentFrom greaterThan (==.) (<=.) =
   isPartialOrder element equalTo differentFrom greaterThan (==.) (<=.)
   ++ [total]
   where
-  infix 4 <=.
-
   total =
     forAll element $ \x ->
     forAll element $ \y ->
-      x <=. y || y <=. x
+      (x <=. y) || (y <=. x)
 
 -- | Tests relating various partial order operators. Does not include
 -- any tests from 'isPartialOrder'.
@@ -301,17 +285,15 @@ isPartialOrderOperators
 isPartialOrderOperators element greaterThan (==.) (<=.) (<.) (>=.) (>.) =
   [lt_le, gt_ge, ge_le, lt_gt]
   where
-  infix 4 ==., <=., <., >=., >.
-
   twoElems = pair3 element greaterThan
 
   lt_le =
     forAll twoElems $ \(x, y) ->
-      (x <. y) == (x <=. y && not (x ==. y))
+      (x <. y) == ((x <=. y) && not (x ==. y))
 
   gt_ge =
     forAll twoElems $ \(x, y) ->
-      (x >. y) == (x >=. y && not (x ==. y))
+      (x >. y) == ((x >=. y) && not (x ==. y))
 
   ge_le =
     forAll twoElems $ \(x, y) ->

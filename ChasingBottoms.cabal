@@ -59,9 +59,9 @@ description:
   computations, such as the following example, and then it can be nice to
   be able to apply a time-out:
   .
-    [@> timeOut' 1 (reverse [1..5\]) >>= print@] @Value [5,4,3,2,1]@
+    [@> timeOut' 1 (reverse [1..5\])@] @Value [5,4,3,2,1]@
   .
-    [@> timeOut' 1 (reverse [1..\]) >>= print@] @NonTermination@
+    [@> timeOut' 1 (reverse [1..\])@] @NonTermination@
   .
   The time-out functionality can be used to treat \"slow\" computations as
   bottoms:
@@ -84,33 +84,28 @@ description:
   .
     [@> let primes = unfoldr (\\(x:xs) -> Just (x, filter ((\/= 0) . (\`mod\` x)) xs)) [2..\]@]
   .
-    [@> timeOutMicro 100 (print $ filter ((== 1) . (\`mod\` 83)) primes) >>= print@] @[167,499NonTermination@
+    [@> timeOutMicro 100 (print $ filter ((== 1) . (\`mod\` 83)) primes)@] @[167,499,9NonTermination@
   .
-    [@> timeOutMicro 100 (print $ take 4 $ filter ((== 1) . (\`mod\` 83)) primes) >>= print@] @[167,499,997NonTermination@
+    [@> timeOutMicro 100 (print $ take 6 $ filter ((== 1) . (\`mod\` 83)) primes)@] @[167,499,997,1163,1993NonTermination@
   .
-    [@> timeOutMicro 100 (print $ take 4 $ filter ((== 1) . (\`mod\` 83)) primes) >>= print@] @[167,499,997,1163]@
+    [@> timeOutMicro 100 (print $ take 6 $ filter ((== 1) . (\`mod\` 83)) primes)@] @[167,499,997,1163,1993,2657]@
   .
     [@ @] @Value ()@
-  .
-  All the type annotations above are required.
   .
   For the underlying theory and a larger example involving use of
   QuickCheck, see the article \"Chasing Bottoms, A Case Study in Program
   Verification in the Presence of Partial and Infinite Values\"
   (<http://www.cs.nott.ac.uk/~nad/publications/danielsson-jansson-mpc2004.html>).
   .
-  The code has been tested under GHC 6.8. Most parts can probably be
+  The code has been tested under GHC 6.12. Most parts can probably be
   ported to other Haskell compilers, but that would require some work.
   The @TimeOut@ functions require preemptive scheduling, and most of the
   rest requires @Data.Generics@; @isBottom@ only requires exceptions,
   though.
 category:           Testing
-tested-with:        GHC == 6.8.2
-cabal-version:      >= 1.2 && < 2
+tested-with:        GHC == 6.12.1
+cabal-version:      == 1.8.*
 build-type:         Simple
-
-flag small_base
-    description: Choose the new smaller, split-up base package.
 
 library
     exposed-modules:
@@ -125,14 +120,12 @@ library
 
     other-modules: Test.ChasingBottoms.IsType
 
-    build-depends: QuickCheck >= 1.1 && < 2,
-                   mtl >= 1.1 && < 2
-    if flag(small_base)
-        build-depends: base >= 3 && < 4,
-                       containers >= 0.1 && < 1,
-                       random >= 1 && < 2
-    else
-        build-depends: base >= 2 && < 3
+    build-depends: QuickCheck == 2.1.*,
+                   mtl == 1.1.*,
+                   base == 4.*,
+                   containers == 0.3.*,
+                   random == 1.0.*,
+                   syb >= 0.1.0.2 && < 0.2
 
 -- It would be nice if the tests that can be accessed through
 -- Test.ChasingBottoms.Tests.main could be run automatically using

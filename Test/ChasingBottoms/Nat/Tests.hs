@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 -- | Tests for "Test.ChasingBottoms.Nat".
 
@@ -10,7 +10,6 @@ import Test.ChasingBottoms.Nat
 import Test.ChasingBottoms.SemanticOrd
 import Test.ChasingBottoms.TestUtilities
 import Test.QuickCheck
-import Test.QuickCheck.Batch
 import Data.Maybe
 import Data.List
 import Data.Ratio

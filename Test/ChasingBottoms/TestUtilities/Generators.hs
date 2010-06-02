@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE RankNTypes, DeriveDataTypeable #-}
 
 -- | Generators that are part of the testing framework.
 
@@ -47,7 +47,6 @@ import Test.ChasingBottoms.IsBottom
 import Test.ChasingBottoms.SemanticOrd
 import Test.ChasingBottoms.TestUtilities
 import Test.QuickCheck
-import Test.QuickCheck.Batch (run)
 import Data.Generics
 import Control.Monad
 import Data.Maybe
@@ -118,7 +117,7 @@ infiniteTreeOf gen = infTree
                       ]
 
 testGen :: (Show a, Data a) => Nat -> Gen a -> IO ()
-testGen depth gen = test $ forAll gen $ \n ->
+testGen depth gen = quickCheck $ forAll gen $ \n ->
                       collect (approxShow depth n) $ True
 
 ------------------------------------------------------------------------
@@ -163,7 +162,7 @@ function coGen gen = frequency [ (1, return bottom)
 
 testFunction :: (Data a, Data b) => Nat -> Cogen a -> Gen b -> [a] -> IO ()
 testFunction depth coGen gen inputs =
-  test $ forAll (function coGen gen) $ \f ->
+  quickCheck $ forAll (function coGen gen) $ \f ->
     collect (map (\x -> approxShow depth (x, f x)) inputs) $ True
 
 ------------------------------------------------------------------------
@@ -251,7 +250,7 @@ prop_notEqualGen element gen =
     x /=! y
 
 testGenPair :: (Show a, Data a) => Nat -> Gen a -> (a -> Gen a) -> IO ()
-testGenPair depth gen gen' = test $
+testGenPair depth gen gen' = quickCheck $
   forAll (pair gen gen') $ \(x, y) ->
     collect (approxShow depth (x, y)) $ True
 
