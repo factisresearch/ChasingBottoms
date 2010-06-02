@@ -5,7 +5,6 @@ license-file:       LICENCE
 copyright:          Copyright (c) Nils Anders Danielsson 2004-2010.
 author:             Nils Anders Danielsson
 maintainer:         http://www.cs.nott.ac.uk/~nad/contact.html
-stability:          experimental
 synopsis:           For testing partial and infinite values.
 description:
   Do you ever feel the need to test code involving bottoms (e.g. calls to
