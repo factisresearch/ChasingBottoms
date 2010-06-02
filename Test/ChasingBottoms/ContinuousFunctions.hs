@@ -13,7 +13,7 @@
 -- Module      :  Test.ChasingBottoms.ContinuousFunctions
 -- Copyright   :  (c) Nils Anders Danielsson 2005-2008
 -- License     :  See the file LICENCE.
--- 
+--
 -- Maintainer  :  http://www.cs.nott.ac.uk/~nad/
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-specific)
@@ -26,7 +26,7 @@
 --
 -- A framework for generating possibly non-strict, partial,
 -- continuous functions.
--- 
+--
 -- The functions generated using the standard QuickCheck 'Arbitrary'
 -- instances are all strict. In the presence of partial and infinite
 -- values testing using only strict functions leads to worse coverage
@@ -37,15 +37,15 @@
 -- instance, using
 --
 -- > type Cogen a = forall b. a -> Gen b -> Gen b
--- > 
+-- >
 -- > integer :: Gen Integer
 -- > integer = frequency [ (1, return bottom), (10, arbitrary) ]
--- > 
+-- >
 -- > coBool :: CoGen Bool
 -- > coBool b | isBottom b = variant 0
 -- > coBool False          = variant 1
 -- > coBool True           = variant 2
--- > 
+-- >
 -- > function :: Cogen a -> Gen b -> Gen (a -> b)
 -- > function coGen gen = promote (\a -> coGen a gen)
 --
@@ -78,7 +78,7 @@
 --     just one transformation per input, but one transformation per
 --     constructor in the input. 'PatternMatch'es can be constructed
 --     generically using 'match'.
--- 
+--
 -- (2) Then the result is generated, almost like for a normal
 --     'Arbitrary' instance. However, for each constructor generated a
 --     subset of the transformations from step 1 are applied. This
@@ -94,7 +94,7 @@
 -- >   = Branch (Tree a) (Tree a)
 -- >   | Leaf a
 -- >     deriving (Show, Typeable, Data)
--- > 
+-- >
 -- > finiteTreeOf :: MakeResult a -> MakeResult (Tree a)
 -- > finiteTreeOf makeResult = sized' tree
 -- >   where
@@ -107,7 +107,7 @@
 -- >                  ]
 -- >     where
 -- >     tree' = tree (size `div` 2)
--- > 
+-- >
 -- >     baseCase =
 -- >       frequency' [ (1, return bottom)
 -- >                  , (2, liftM Leaf makeResult)

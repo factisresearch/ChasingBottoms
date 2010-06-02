@@ -4,7 +4,7 @@
 -- Module      :  Test.ChasingBottoms.ApproxShow
 -- Copyright   :  (c) Nils Anders Danielsson 2004-2008
 -- License     :  See the file LICENCE.
--- 
+--
 -- Maintainer  :  http://www.cs.nott.ac.uk/~nad/
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-specific)
@@ -37,7 +37,7 @@ class ApproxShow a where
   --   * All detectable occurences of bottoms are replaced by @\"_|_\"@.
   --
   --   * Non-bottom functions are displayed as @\"\<function \/= _|_\>\"@.
-  -- 
+  --
   approxShowsPrec :: Nat -> Prec -> a -> ShowS
   approxShows     :: Nat -> a -> ShowS
   approxShow      :: Nat -> a -> String
@@ -109,7 +109,7 @@ gShowsPrec insideList n p (a :: a)
   | otherwise    = showParen (not (isAtom a) && p > appPrec) $
                    showCon a .
                    continueL (.^.) nil (succ appPrec) a
-                   
+
     where
     continueL f x p = gmapQl f x (gShowsPrec False (pred n) p)
     continueR f x p = gmapQr f x (gShowsPrec False (pred n) p)

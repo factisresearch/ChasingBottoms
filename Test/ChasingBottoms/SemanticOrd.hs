@@ -4,7 +4,7 @@
 -- Module      :  Test.ChasingBottoms.SemanticOrd
 -- Copyright   :  (c) Nils Anders Danielsson 2004-2008
 -- License     :  See the file LICENCE.
--- 
+--
 -- Maintainer  :  http://www.cs.nott.ac.uk/~nad/
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-specific)
@@ -188,7 +188,7 @@ semanticMeet' tweak a (b :: b) =
     bottom
    else
     gzipWithT (\x y -> semanticMeet' tweak x y) a b
-    
+
 semanticJoin' :: (Data a, Data b) => Tweak -> a -> b -> Maybe b
 semanticJoin' tweak a (b :: b) =
   case ( isBottomTimeOut (timeOutLimit tweak) a
