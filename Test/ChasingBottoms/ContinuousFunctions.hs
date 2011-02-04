@@ -214,7 +214,7 @@ type MakePM a = a -> PatternMatch
 -- These functions provided inspiration for the generic one below.
 
 matchFlat :: CoArbitrary a => MakePM a
-matchFlat a = PatternMatch { apply = coarbitrary a, more = empty }
+matchFlat a = PatternMatch { apply = coarbitrary a, more = Seq.empty }
 
 data Tree a
    = Branch (Tree a) (Tree a)
@@ -246,7 +246,7 @@ match x = PatternMatch
     CharConstr s  -> nonBottomError "match: Encountered CharConstr."
 
   more :: forall a. Data a => a -> Seq PatternMatch
-  more = gmapQr (<|) empty match
+  more = gmapQr (<|) Seq.empty match
 
 ------------------------------------------------------------------------
 -- MakeResult monad
@@ -320,7 +320,7 @@ getMatches pms = do
 -- | Concatenates arguments.
 
 concat :: Seq (Seq a) -> Seq a
-concat = Seq.foldr (><) empty
+concat = Seq.foldr (><) Seq.empty
 
 -- | Composes arguments.
 
@@ -333,7 +333,7 @@ compose = Seq.foldr (.) id
 
 partition' :: Int -> Seq a -> Gen (Seq a, Seq a)
 partition' freq ss = case viewl ss of
-  EmptyL  -> return (empty, empty)
+  EmptyL  -> return (Seq.empty, Seq.empty)
   x :< xs -> do
     (ys, zs) <- partition' freq xs
     frequency [ (1,    return (x <| ys, zs))

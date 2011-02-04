@@ -79,8 +79,8 @@ testDistribution test t = do
   unless ok $ putStrLn msg
   return ok
   where
-  apply test (Success labels) = test labels
-  apply _    _                = (False, "Test failed.")
+  apply test Success{labels = labels} = test labels
+  apply _    _                        = (False, "Test failed.")
 
 spread labels = (uniqueShare >= 3%4, "uniqueShare: " ++ show uniqueShare)
   where
