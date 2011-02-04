@@ -1,27 +1,6 @@
 ChasingBottoms
 --------------
 
-Building
---------
-
-To build: Use Cabal, or use ghc --make Test.ChasingBottoms. (If
-Test.ChasingBottoms is already installed you may need to add something
-like -ignore-package ChasingBottoms.)
-
-Do not use Cabal to build the documentation. Use make docs instead.
-You may need to edit the Makefile first.
-
-To run through the test suite, execute Test.ChasingBottoms.Tests.main.
-
-Possible future work
---------------------
-
-* Making it easier to test equality etc. of functions. (This may be
-  easier using the new version of Scrap your boilerplate, Scrap your
-  boilerplate with class.)
-
-* More custom generators for partial and infinite values.
-
 Known bugs
 ----------
 
