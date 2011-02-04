@@ -1,6 +1,6 @@
 -- |
 -- Module      :  Test.ChasingBottoms.IsType
--- Copyright   :  (c) Nils Anders Danielsson 2004-2010
+-- Copyright   :  (c) Nils Anders Danielsson 2004-2011
 -- License     :  See the file LICENCE.
 --
 -- Maintainer  :  http://www.cs.nott.ac.uk/~nad/
