@@ -4,7 +4,7 @@ license:            OtherLicense
 license-file:       LICENCE
 copyright:          Copyright (c) Nils Anders Danielsson 2004-2011.
 author:             Nils Anders Danielsson
-maintainer:         http://www.cs.nott.ac.uk/~nad/contact.html
+maintainer:         http://www.cse.chalmers.se/~nad/
 synopsis:           For testing partial and infinite values.
 description:
   Do you ever feel the need to test code involving bottoms (e.g. calls to
@@ -15,7 +15,7 @@ description:
   waiting to see how much gets printed before the first exception is
   encountered. However, that quickly gets tiresome and is hard to automate
   using e.g. QuickCheck
-  (<http://www.cs.chalmers.se/~rjmh/QuickCheck/>). With this library you
+  (<http://www.cse.chalmers.se/~rjmh/QuickCheck/>). With this library you
   can do the tests as simply as the following examples show.
   .
   Testing explicitly for bottoms:
@@ -92,7 +92,7 @@ description:
   For the underlying theory and a larger example involving use of
   QuickCheck, see the article \"Chasing Bottoms, A Case Study in Program
   Verification in the Presence of Partial and Infinite Values\"
-  (<http://www.cs.nott.ac.uk/~nad/publications/danielsson-jansson-mpc2004.html>).
+  (<http://www.cse.chalmers.se/~nad/publications/danielsson-jansson-mpc2004.html>).
   .
   The code has been tested under GHC 7.0. Most parts can probably be
   ported to other Haskell compilers, but that would require some work.

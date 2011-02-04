@@ -15,7 +15,7 @@
 -- Copyright   :  (c) Nils Anders Danielsson 2005-2011
 -- License     :  See the file LICENCE.
 --
--- Maintainer  :  http://www.cs.nott.ac.uk/~nad/
+-- Maintainer  :  http://www.cse.chalmers.se/~nad/
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-specific)
 --
