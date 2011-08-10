@@ -94,13 +94,13 @@ description:
   Verification in the Presence of Partial and Infinite Values\"
   (<http://www.cse.chalmers.se/~nad/publications/danielsson-jansson-mpc2004.html>).
   .
-  The code has been tested under GHC 7.0. Most parts can probably be
-  ported to other Haskell compilers, but that would require some work.
-  The @TimeOut@ functions require preemptive scheduling, and most of the
-  rest requires @Data.Generics@; @isBottom@ only requires exceptions,
-  though.
+  The code has been tested using GHC. Most parts can probably be
+  ported to other Haskell compilers, but this would require some work.
+  The @TimeOut@ functions require preemptive scheduling, and most of
+  the rest requires @Data.Generics@; @isBottom@ only requires
+  exceptions, though.
 category:           Testing
-tested-with:        GHC == 7.0.1
+tested-with:        GHC == 7.2.1
 cabal-version:      == 1.8.*
 build-type:         Simple
 
@@ -119,10 +119,10 @@ library
 
     build-depends: QuickCheck >= 2.1 && < 2.5,
                    mtl >= 1.1 && < 2.1,
-                   base >= 4.0 && < 4.4,
+                   base >= 4.0 && < 4.5,
                    containers >= 0.3 && < 0.5,
                    random == 1.0.*,
-                   syb >= 0.1.0.2 && < 0.3
+                   syb >= 0.1.0.2 && < 0.4
 
 flag build-tests
     description: Build the test suite.
@@ -148,8 +148,8 @@ executable ChasingBottomsTestSuite
 
     build-depends: QuickCheck >= 2.1 && < 2.5,
                    mtl >= 1.1 && < 2.1,
-                   base >= 4.0 && < 4.4,
+                   base >= 4.0 && < 4.5,
                    containers >= 0.3 && < 0.5,
                    random == 1.0.*,
-                   syb >= 0.1.0.2 && < 0.3,
+                   syb >= 0.1.0.2 && < 0.4,
                    array == 0.3.*
