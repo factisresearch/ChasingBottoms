@@ -104,6 +104,10 @@ tested-with:        GHC == 7.2.1
 cabal-version:      == 1.8.*
 build-type:         Simple
 
+source-repository head
+  type:     darcs
+  location: http://www.cse.chalmers.se/~nad/repos/ChasingBottoms/
+
 library
     exposed-modules:
         Test.ChasingBottoms,
