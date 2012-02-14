@@ -32,7 +32,7 @@ con = typeRepTyCon . typeOf
 -- for debugging purposes anyway. The unit type is not considered to
 -- be a tuple.
 isTuple :: Typeable a => a -> Bool
-isTuple x = "(," `isPrefixOf` tyConString (con x)
+isTuple x = "(," `isPrefixOf` show (con x)
 
 isString :: Typeable a => a -> Bool
 isString x = isList x && typeRepArgs (typeOf x) == typeRepArgs (typeOf "")
