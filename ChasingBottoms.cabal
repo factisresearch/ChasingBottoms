@@ -122,9 +122,9 @@ library
     other-modules: Test.ChasingBottoms.IsType
 
     build-depends: QuickCheck >= 2.1 && < 2.5,
-                   mtl >= 1.1 && < 2.1,
+                   mtl >= 1.1 && < 2.2,
                    base >= 4.0 && < 4.6,
-                   containers >= 0.3 && < 0.5,
+                   containers >= 0.3 && < 0.6,
                    random == 1.0.*,
                    syb >= 0.1.0.2 && < 0.4
 
@@ -151,9 +151,9 @@ executable ChasingBottomsTestSuite
                    Test.ChasingBottoms.TimeOut.Tests
 
     build-depends: QuickCheck >= 2.1 && < 2.5,
-                   mtl >= 1.1 && < 2.1,
+                   mtl >= 1.1 && < 2.2,
                    base >= 4.0 && < 4.6,
-                   containers >= 0.3 && < 0.5,
+                   containers >= 0.3 && < 0.6,
                    random == 1.0.*,
                    syb >= 0.1.0.2 && < 0.4,
                    array >= 0.3 && < 0.5
