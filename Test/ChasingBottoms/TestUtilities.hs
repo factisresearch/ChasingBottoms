@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 -- | Some utilities that are part of the testing framework.
 
 module Test.ChasingBottoms.TestUtilities
@@ -37,7 +39,11 @@ import Text.Show.Functions
 
 run :: Testable p => p -> IO Result
 run = quickCheckWithResult (stdArgs { maxSuccess = 1000
+#if MIN_VERSION_QuickCheck(2,5,0)
+                                    , maxDiscardRatio = 5
+#else
                                     , maxDiscard = 5000
+#endif
                                     })
 
 -- | Runs a bunch of QuickCheck tests, printing suitable information
