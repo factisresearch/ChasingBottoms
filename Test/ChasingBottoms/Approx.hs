@@ -3,7 +3,7 @@
 
 -- |
 -- Module      :  Test.ChasingBottoms.Approx
--- Copyright   :  (c) Nils Anders Danielsson 2004-2011
+-- Copyright   :  (c) Nils Anders Danielsson 2004-2012
 -- License     :  See the file LICENCE.
 --
 -- Maintainer  :  http://www.cse.chalmers.se/~nad/
