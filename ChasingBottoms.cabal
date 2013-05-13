@@ -100,7 +100,7 @@ description:
   the rest requires @Data.Generics@; @isBottom@ only requires
   exceptions, though.
 category:           Testing
-tested-with:        GHC == 7.6.1
+tested-with:        GHC == 7.6.3
 cabal-version:      >= 1.8
 build-type:         Simple
 
@@ -121,12 +121,12 @@ library
 
     other-modules: Test.ChasingBottoms.IsType
 
-    build-depends: QuickCheck >= 2.1 && < 2.6,
+    build-depends: QuickCheck >= 2.1 && < 2.7,
                    mtl >= 1.1 && < 2.2,
                    base >= 4.0 && < 4.7,
                    containers >= 0.3 && < 0.6,
                    random == 1.0.*,
-                   syb >= 0.1.0.2 && < 0.4
+                   syb >= 0.1.0.2 && < 0.5
 
 flag build-tests
     description: Build the test suite.
@@ -150,10 +150,10 @@ executable ChasingBottomsTestSuite
                    Test.ChasingBottoms.TestUtilities.Generators,
                    Test.ChasingBottoms.TimeOut.Tests
 
-    build-depends: QuickCheck >= 2.1 && < 2.6,
+    build-depends: QuickCheck >= 2.1 && < 2.7,
                    mtl >= 1.1 && < 2.2,
                    base >= 4.0 && < 4.7,
                    containers >= 0.3 && < 0.6,
                    random == 1.0.*,
-                   syb >= 0.1.0.2 && < 0.4,
+                   syb >= 0.1.0.2 && < 0.5,
                    array >= 0.3 && < 0.5
