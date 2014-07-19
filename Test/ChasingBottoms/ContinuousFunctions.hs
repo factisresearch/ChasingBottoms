@@ -159,6 +159,7 @@ import Prelude as P hiding (concat)
 import Test.ChasingBottoms.IsBottom
 import Control.Monad
 import Control.Monad.Reader
+import Control.Applicative
 import Control.Arrow
 import System.Random
 import Data.Generics
@@ -273,7 +274,7 @@ match x = PatternMatch
 
 newtype MakeResult a
   = MR { unMR :: ReaderT PatternMatches Gen a }
-    deriving (Functor, Monad)
+    deriving (Functor, Applicative, Monad)
 
 type PatternMatches = Seq PatternMatch
 

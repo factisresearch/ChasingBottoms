@@ -22,7 +22,7 @@ notbot x = notbot x
 
 data T' a = L' | B' (T' a) (T' a) deriving Eq
 
-instance Monad T'
+instance Functor T'
 
 leftInfinite' = B' leftInfinite' L'
 
@@ -56,7 +56,7 @@ tests =
 
     -- Missing methods.
     -- Skip this test to avoid compiler warnings.
-  , isBottom (L' >> L')
+  , isBottom (fmap id L')
 
     -- Array stuff.
   , isBottom (array (1,0) [] ! 0)
