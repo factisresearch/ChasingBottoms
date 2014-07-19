@@ -1,4 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+-- The following (possibly unnecessary) options are included due to
+-- the use of unsafePerformIO below.
+{-# OPTIONS_GHC -fno-cse -fno-full-laziness #-}
 
 -- |
 -- Module      :  Test.ChasingBottoms.IsBottom
@@ -90,6 +93,9 @@ nonBottomError = E.throw . E.AssertionFailed
 -- 'isBottomTimeOut' is subject to all the same vagaries as
 -- 'T.timeOut'.
 
+-- The following pragma is included due to the use of unsafePerformIO
+-- below.
+{-# NOINLINE isBottomTimeOut #-}
 isBottomTimeOut :: Maybe Int -> a -> Bool
 isBottomTimeOut timeOutLimit f = unsafePerformIO $
   maybeTimeOut (E.evaluate f) `E.catches`
