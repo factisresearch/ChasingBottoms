@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables,
+{-# LANGUAGE CPP, RankNTypes, ScopedTypeVariables,
              GeneralizedNewtypeDeriving, DeriveDataTypeable #-}
 
 -- TODO: Can we pattern match on functions?
@@ -143,7 +143,16 @@ module Test.ChasingBottoms.ContinuousFunctions
   , listOf
   ) where
 
-import Test.QuickCheck hiding ((><), listOf)
+import Test.QuickCheck
+  hiding ( (><)
+         , listOf
+#if MIN_VERSION_QuickCheck(2,7,0)
+         , infiniteListOf
+#endif
+         )
+#if MIN_VERSION_QuickCheck(2,7,0)
+import Test.QuickCheck.Gen.Unsafe (promote)
+#endif
 import Data.Sequence as Seq
 import Data.Foldable as Seq (foldr)
 import Prelude as P hiding (concat)

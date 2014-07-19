@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, DeriveDataTypeable #-}
+{-# LANGUAGE CPP, RankNTypes, DeriveDataTypeable #-}
 
 -- | Generators that are part of the testing framework.
 
@@ -47,6 +47,12 @@ import Test.ChasingBottoms.IsBottom
 import Test.ChasingBottoms.SemanticOrd
 import Test.ChasingBottoms.TestUtilities
 import Test.QuickCheck
+#if MIN_VERSION_QuickCheck(2,7,0)
+  hiding (infiniteListOf)
+#endif
+#if MIN_VERSION_QuickCheck(2,7,0)
+import Test.QuickCheck.Gen.Unsafe (promote)
+#endif
 import Data.Generics
 import Control.Monad
 import Data.Maybe
