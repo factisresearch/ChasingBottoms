@@ -12,7 +12,7 @@
 
 -- |
 -- Module      :  Test.ChasingBottoms.ContinuousFunctions
--- Copyright   :  (c) Nils Anders Danielsson 2005-2013
+-- Copyright   :  (c) Nils Anders Danielsson 2005-2014
 -- License     :  See the file LICENCE.
 --
 -- Maintainer  :  http://www.cse.chalmers.se/~nad/

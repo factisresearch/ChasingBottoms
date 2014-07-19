@@ -2,7 +2,7 @@
 
 -- |
 -- Module      :  Test.ChasingBottoms.TimeOut
--- Copyright   :  (c) Nils Anders Danielsson 2004-2013
+-- Copyright   :  (c) Nils Anders Danielsson 2004-2014
 -- License     :  See the file LICENCE.
 --
 -- Maintainer  :  http://www.cse.chalmers.se/~nad/
