@@ -125,7 +125,7 @@ library
                    mtl >= 1.1 && < 2.3,
                    base >= 4.0 && < 4.8,
                    containers >= 0.3 && < 0.6,
-                   random == 1.0.*,
+                   random >= 1.0 && < 1.2,
                    syb >= 0.1.0.2 && < 0.5
 
 flag build-tests
@@ -154,6 +154,6 @@ executable ChasingBottomsTestSuite
                    mtl >= 1.1 && < 2.3,
                    base >= 4.0 && < 4.8,
                    containers >= 0.3 && < 0.6,
-                   random == 1.0.*,
+                   random >= 1.0 && < 1.2,
                    syb >= 0.1.0.2 && < 0.5,
                    array >= 0.3 && < 0.6
