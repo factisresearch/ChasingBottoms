@@ -5,7 +5,7 @@
 
 -- |
 -- Module      :  Test.ChasingBottoms.IsBottom
--- Copyright   :  (c) Nils Anders Danielsson 2004-2014
+-- Copyright   :  (c) Nils Anders Danielsson 2004-2015
 -- License     :  See the file LICENCE.
 --
 -- Maintainer  :  http://www.cse.chalmers.se/~nad/
