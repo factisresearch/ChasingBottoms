@@ -137,8 +137,8 @@ liftAppr tweak op x y = op tweak (appr x) (appr y)
 
 ------------------------------------------------------------------------
 
-type Rel' = (Data a, Data b) => Tweak -> a -> b -> Bool
-type Rel  = (Data a, Data b) => a -> b -> Bool
+type Rel' = forall a b. (Data a, Data b) => Tweak -> a -> b -> Bool
+type Rel  = forall a b. (Data a, Data b) => a -> b -> Bool
 
 semanticEq', semanticLE' :: Rel'
 

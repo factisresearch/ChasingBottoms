@@ -123,7 +123,7 @@ library
 
     build-depends: QuickCheck >= 2.1 && < 2.8,
                    mtl >= 1.1 && < 2.3,
-                   base >= 4.0 && < 4.8,
+                   base >= 4.0 && < 4.9,
                    containers >= 0.3 && < 0.6,
                    random >= 1.0 && < 1.2,
                    syb >= 0.1.0.2 && < 0.5
@@ -152,7 +152,7 @@ executable ChasingBottomsTestSuite
 
     build-depends: QuickCheck >= 2.1 && < 2.8,
                    mtl >= 1.1 && < 2.3,
-                   base >= 4.0 && < 4.8,
+                   base >= 4.0 && < 4.9,
                    containers >= 0.3 && < 0.6,
                    random >= 1.0 && < 1.2,
                    syb >= 0.1.0.2 && < 0.5,
