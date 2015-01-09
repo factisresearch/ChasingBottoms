@@ -101,7 +101,7 @@ description:
   exceptions, though.
 category:           Testing
 tested-with:        GHC == 7.6.3
-cabal-version:      >= 1.8
+cabal-version:      >= 1.9.2
 build-type:         Simple
 
 source-repository head
@@ -128,14 +128,8 @@ library
                    random >= 1.0 && < 1.2,
                    syb >= 0.1.0.2 && < 0.5
 
-flag build-tests
-    description: Build the test suite.
-    default:     False
-    manual:      True
-
-executable ChasingBottomsTestSuite
-    if !flag(build-tests)
-      buildable:   False
+test-suite ChasingBottomsTestSuite
+    type:          exitcode-stdio-1.0
 
     main-is:       Test/ChasingBottoms/Tests.hs
 
