@@ -99,13 +99,11 @@ description:
   .
   Timeouts can also be applied to @IO@ computations:
   .
-  >> let primes = unfoldr (\(x:xs) -> Just (x, filter ((/= 0) . (`mod` x)) xs)) [2..]
-  >> timeOutMicro 100 (print $ filter ((== 1) . (`mod` 83)) primes)
-  >[167,499,9NonTermination
-  >> timeOutMicro 100 (print $ take 6 $ filter ((== 1) . (`mod` 83)) primes)
-  >[167,499,997,1163,1993NonTermination
-  >> timeOutMicro 100 (print $ take 6 $ filter ((== 1) . (`mod` 83)) primes)
-  >[167,499,997,1163,1993,2657]
+  >> let primes () = unfoldr (\(x:xs) -> Just (x, filter ((/= 0) . (`mod` x)) xs)) [2..]
+  >> timeOutMicro 100 (print $ primes ())
+  >[2,NonTermination
+  >> timeOutMicro 10000 (print $ take 10 $ primes ())
+  >[2,3,5,7,11,13,17,19,23,29]
   >Value ()
   .
   For the underlying theory and a larger example involving use of
@@ -119,7 +117,7 @@ description:
   the rest requires @Data.Generics@; @isBottom@ only requires
   exceptions, though.
 category:           Testing
-tested-with:        GHC == 7.6.3
+tested-with:        GHC == 7.8.4
 cabal-version:      >= 1.9.2
 build-type:         Simple
 
