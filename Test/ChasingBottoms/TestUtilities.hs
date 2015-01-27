@@ -47,9 +47,7 @@ run = quickCheckWithResult (stdArgs { maxSuccess = 1000
                                     })
 
 -- | Runs a bunch of QuickCheck tests, printing suitable information
--- to standard output. Returns 'True' if no tests fail. Note that a
--- test where the inputs are exhausted is considered to have
--- succeeded.
+-- to standard output. Returns 'True' if no tests fail.
 
 runQuickCheckTests :: [IO Result]
                       -- ^ Create the tests in this list from ordinary
