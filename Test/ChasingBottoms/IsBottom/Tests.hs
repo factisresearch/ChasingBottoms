@@ -1,5 +1,9 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
+-- The code below intentionally triggers some GHC warnings, so these
+-- warnings are turned off.
+{-# OPTIONS_GHC -fno-warn-missing-methods -fno-warn-missing-fields #-}
+
 -- | Tests of the functions in "Test.ChasingBottoms.IsBottom".
 --
 -- Note that the warnings given when compiling this module are
