@@ -143,7 +143,7 @@ library
                    base >= 4.0 && < 4.9,
                    containers >= 0.3 && < 0.6,
                    random >= 1.0 && < 1.2,
-                   syb >= 0.1.0.2 && < 0.5
+                   syb >= 0.1.0.2 && < 0.6
 
 test-suite ChasingBottomsTestSuite
     type:          exitcode-stdio-1.0
@@ -166,5 +166,5 @@ test-suite ChasingBottomsTestSuite
                    base >= 4.0 && < 4.9,
                    containers >= 0.3 && < 0.6,
                    random >= 1.0 && < 1.2,
-                   syb >= 0.1.0.2 && < 0.5,
+                   syb >= 0.1.0.2 && < 0.6,
                    array >= 0.3 && < 0.6
