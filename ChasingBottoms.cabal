@@ -20,47 +20,47 @@ description:
   .
   Testing explicitly for bottoms:
   .
-  >> isBottom (head [])
-  >True
+  > > isBottom (head [])
+  > True
   .
-  >> isBottom bottom
-  >True
+  > > isBottom bottom
+  > True
   .
-  >> isBottom (\_ -> bottom)
-  >False
+  > > isBottom (\_ -> bottom)
+  > False
   .
-  >> isBottom (bottom, bottom)
-  >False
+  > > isBottom (bottom, bottom)
+  > False
   .
   Comparing finite, partial values:
   .
-  >> ((bottom, 3) :: (Bool, Int)) ==! (bottom, 2+5-4)
-  >True
+  > > ((bottom, 3) :: (Bool, Int)) ==! (bottom, 2+5-4)
+  > True
   .
-  >> ((bottom, bottom) :: (Bool, Int)) <! (bottom, 8)
-  >True
+  > > ((bottom, bottom) :: (Bool, Int)) <! (bottom, 8)
+  > True
   .
   Showing partial and infinite values (@\\\/!@ is join and @\/\\!@ is meet):
   .
-  >> approxShow 4 $ (True, bottom) \/! (bottom, 'b')
-  >"Just (True, 'b')"
+  > > approxShow 4 $ (True, bottom) \/! (bottom, 'b')
+  > "Just (True, 'b')"
   .
-  >> approxShow 4 $ (True, bottom) /\! (bottom, 'b')
-  >"(_|_, _|_)"
+  > > approxShow 4 $ (True, bottom) /\! (bottom, 'b')
+  > "(_|_, _|_)"
   .
-  >> approxShow 4 $ ([1..] :: [Int])
-  >"[1, 2, 3, _"
+  > > approxShow 4 $ ([1..] :: [Int])
+  > "[1, 2, 3, _"
   .
-  >> approxShow 4 $ (cycle [bottom] :: [Bool])
-  >"[_|_, _|_, _|_, _"
+  > > approxShow 4 $ (cycle [bottom] :: [Bool])
+  > "[_|_, _|_, _|_, _"
   .
   Approximately comparing infinite, partial values:
   .
-  >> approx 100 [2,4..] ==! approx 100 (filter even [1..] :: [Int])
-  >True
+  > > approx 100 [2,4..] ==! approx 100 (filter even [1..] :: [Int])
+  > True
   .
-  >> approx 100 [2,4..] /=! approx 100 (filter even [bottom..] :: [Int])
-  >True
+  > > approx 100 [2,4..] /=! approx 100 (filter even [bottom..] :: [Int])
+  > True
   .
   The code above relies on the fact that @bottom@, just as @error
   \"...\"@, @undefined@ and pattern match failures, yield
@@ -68,11 +68,11 @@ description:
   computations, such as the following example, and then it can be nice to
   be able to apply a time-out:
   .
-  >> timeOut' 1 (reverse [1..5])
-  >Value [5,4,3,2,1]
+  > > timeOut' 1 (reverse [1..5])
+  > Value [5,4,3,2,1]
   .
-  >> timeOut' 1 (reverse [1..])
-  >NonTermination
+  > > timeOut' 1 (reverse [1..])
+  > NonTermination
   .
   The time-out functionality can be used to treat \"slow\" computations as
   bottoms:
@@ -99,12 +99,12 @@ description:
   .
   Timeouts can also be applied to @IO@ computations:
   .
-  >> let primes () = unfoldr (\(x:xs) -> Just (x, filter ((/= 0) . (`mod` x)) xs)) [2..]
-  >> timeOutMicro 100 (print $ primes ())
-  >[2,NonTermination
-  >> timeOutMicro 10000 (print $ take 10 $ primes ())
-  >[2,3,5,7,11,13,17,19,23,29]
-  >Value ()
+  > > let primes () = unfoldr (\(x:xs) -> Just (x, filter ((/= 0) . (`mod` x)) xs)) [2..]
+  > > timeOutMicro 100 (print $ primes ())
+  > [2,NonTermination
+  > > timeOutMicro 10000 (print $ take 10 $ primes ())
+  > [2,3,5,7,11,13,17,19,23,29]
+  > Value ()
   .
   For the underlying theory and a larger example involving use of
   QuickCheck, see the article \"Chasing Bottoms, A Case Study in Program
