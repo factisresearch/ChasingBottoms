@@ -140,10 +140,10 @@ library
 
     build-depends: QuickCheck >= 2.1 && < 2.9,
                    mtl >= 1.1 && < 2.3,
-                   base >= 4.0 && < 4.9,
+                   base >= 4.0 && < 4.10,
                    containers >= 0.3 && < 0.6,
                    random >= 1.0 && < 1.2,
-                   syb >= 0.1.0.2 && < 0.6
+                   syb >= 0.1.0.2 && < 0.7
 
 test-suite ChasingBottomsTestSuite
     type:          exitcode-stdio-1.0
@@ -163,8 +163,8 @@ test-suite ChasingBottomsTestSuite
 
     build-depends: QuickCheck >= 2.1 && < 2.9,
                    mtl >= 1.1 && < 2.3,
-                   base >= 4.0 && < 4.9,
+                   base >= 4.0 && < 4.10,
                    containers >= 0.3 && < 0.6,
                    random >= 1.0 && < 1.2,
-                   syb >= 0.1.0.2 && < 0.6,
+                   syb >= 0.1.0.2 && < 0.7,
                    array >= 0.3 && < 0.6
