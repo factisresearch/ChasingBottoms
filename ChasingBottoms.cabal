@@ -78,22 +78,22 @@ description:
   bottoms:
   .
   @
-  > let tweak = Tweak &#x7b; approxDepth = Just 5, timeOutLimit = Just 2 &#x7d;
-  > semanticEq tweak (reverse [1..], [1..]) (bottom :: [Int], [1..] :: [Int])
+  \> let tweak = Tweak &#x7b; approxDepth = Just 5, timeOutLimit = Just 2 &#x7d;
+  \> semanticEq tweak (reverse [1..], [1..]) (bottom :: [Int], [1..] :: [Int])
   True
   @
   .
   @
-  > let tweak = noTweak &#x7b; timeOutLimit = Just 2 &#x7d;
-  > semanticJoin tweak (reverse [1..], True) ([] :: [Int], bottom)
+  \> let tweak = noTweak &#x7b; timeOutLimit = Just 2 &#x7d;
+  \> semanticJoin tweak (reverse [1..], True) ([] :: [Int], bottom)
   Just ([],True)
   @
   .
   This can of course be dangerous:
   .
   @
-  > let tweak = noTweak &#x7b; timeOutLimit = Just 0 &#x7d;
-  > semanticEq tweak (reverse [1..100000000]) (bottom :: [Integer])
+  \> let tweak = noTweak &#x7b; timeOutLimit = Just 0 &#x7d;
+  \> semanticEq tweak (reverse [1..100000000]) (bottom :: [Integer])
   True
   @
   .
