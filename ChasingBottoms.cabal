@@ -117,7 +117,7 @@ description:
   the rest requires @Data.Generics@; @isBottom@ only requires
   exceptions, though.
 category:           Testing
-tested-with:        GHC == 7.10.1
+tested-with:        GHC == 7.10.3
 cabal-version:      >= 1.9.2
 build-type:         Simple
 
