@@ -15,9 +15,11 @@
 
 module Test.ChasingBottoms.IsBottom
   ( isBottom
+  , isBottomIO
   , bottom
   , nonBottomError
   , isBottomTimeOut
+  , isBottomTimeOutIO
   ) where
 
 import Prelude hiding (catch)
@@ -97,7 +99,18 @@ nonBottomError = E.throw . E.AssertionFailed
 -- below.
 {-# NOINLINE isBottomTimeOut #-}
 isBottomTimeOut :: Maybe Int -> a -> Bool
-isBottomTimeOut timeOutLimit f = unsafePerformIO $
+isBottomTimeOut timeOutLimit f =
+  unsafePerformIO $ isBottomTimeOutIO timeOutLimit f
+
+-- | A variant of 'isBottom' that lives in the 'IO' monad.
+
+isBottomIO :: a -> IO Bool
+isBottomIO = isBottomTimeOutIO Nothing
+
+-- | A variant of 'isBottomTimeOut' that lives in the 'IO' monad.
+
+isBottomTimeOutIO :: Maybe Int -> a -> IO Bool
+isBottomTimeOutIO timeOutLimit f =
   maybeTimeOut (E.evaluate f) `E.catches`
     [ E.Handler (\(_ :: E.ArrayException)   -> return True)
     , E.Handler (\(_ :: E.ErrorCall)        -> return True)
